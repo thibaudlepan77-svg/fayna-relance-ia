@@ -16,7 +16,9 @@ Page de vente       Démo sans compte         Solo 5k / Pro 15k      Email / Wha
 
 ## Étape 1 — DÉCOUVERTE (Page de vente publique)
 
-**URL :** `https://<username>.github.io/fayna-relance-ia/` (GitHub Pages)
+**URL : PAS ENCORE PUBLIQUE.** La page de vente ne peut pas être hébergée sur GitHub Pages
+ni sur Vercel Hobby, les deux interdisent les sites commerciaux (voir `DECISIONS.md`, D1).
+Elle est prête dans `index.html` et attend un hébergeur gratuit à usage commercial autorisé.
 
 **Contenu lu par le prospect :**
 1. **Problème** : « Vos clients vous doivent de l'argent. FAYNA les relance à votre place. » — La douleur trésorerie n°1 des PME sénégalaises.
@@ -33,7 +35,8 @@ Page de vente       Démo sans compte         Solo 5k / Pro 15k      Email / Wha
 
 ## Étape 2 — DÉMO IMMÉDIATE (Sans compte, données fictives)
 
-**URL :** `https://<username>.github.io/fayna-relance-ia/demo.html`
+**URL publique réelle, en ligne et vérifiée le 2026-08-15 (HTTP 200) :**
+`https://thibaudlepan77-svg.github.io/fayna-relance-ia/`
 
 **À l'ouverture (chargement unique) :**
 - `localStorage` pré-rempli avec **3 débiteurs fictifs** :
@@ -42,16 +45,23 @@ Page de vente       Démo sans compte         Solo 5k / Pro 15k      Email / Wha
   3. **Clinique Teranga** — 90 000 FCFA — échéance J-3 — niveau « Premier rappel » — relation nouveau
 - Réglages par défaut : signature « Entreprise Diallo & Fils », canal « Wave ou Orange Money », lieu « Dakar ».
 
-**Actions possibles en 2 min :**
+**Actions réellement possibles dans la démo publiée, vérifiées le 2026-08-15 :**
 1. **Voir le tableau de bord** : KPI (total 880 000 FCFA, 3 relances, plus ancien 47 jours), liste triée par priorité.
 2. **Changer d'onglet langue** : FR / Wolof / FR+Wolof sur chaque fiche.
-3. **Cliquer « Envoyer WhatsApp »** : s'ouvre `wa.me/221771234567?text=...` avec message pré-rempli (ne fait rien si pas d'app).
-4. **Cliquer « Mise en demeure »** (niveau ≥ 2) : ouvre fenêtre imprimable OHADA, montant en toutes lettres.
-5. **Cliquer « Proposer un échéancier »** : saisit 3 mensualités → message bilingue prêt à envoyer, somme exacte.
-6. **Modifier un débiteur** (bouton « Modifier ») → change montant/date → re-génère message.
-7. **Ajouter un 4e client** : formulaire complet → génère relance immédiate.
-8. **Exporter CSV** : récupère le portefeuille avec historique relances.
-9. **Tout effacer** : remet à zéro pour repartir propre.
+3. **Cliquer « Envoyer par WhatsApp »** : ouvre `wa.me/<numéro de la fiche>?text=...` avec message pré-rempli.
+4. **Copier le message** : bouton « Copier », pour un envoi par SMS ou e-mail.
+5. **Modifier un débiteur** (bouton « Modifier ») → change montant/date → re-génère message.
+6. **Ajouter un client** : formulaire complet → génère relance immédiate.
+7. **Supprimer un débiteur**.
+8. **Réinitialiser la démo** : remet les 3 fiches fictives, repart propre.
+
+> **Écart connu, à ne pas re-promettre.** La démo publiée est une version réduite.
+> **L'échéancier négocié, l'export CSV et la génération du document de mise en demeure
+> n'y sont PAS** (mesuré : 0 occurrence dans `demo.html`). Ces trois fonctions existent
+> et sont vérifiées dans le moteur complet archivé (`archive\snapshot-65-79-fayna`,
+> 351 assertions vertes rejouées le 2026-08-15), qui n'est pas encore ce qui est en ligne.
+> Tant que le moteur complet n'est pas publié, **aucun support commercial ne doit dire
+> que la démo fait ces trois choses**. Le harnais `verifier.js` bloque toute réintroduction.
 
 **Aucune inscription, aucun email, aucune clé IA requise.** L'outil est 100 % fonctionnel hors-ligne.
 
@@ -81,8 +91,8 @@ Page de vente       Démo sans compte         Solo 5k / Pro 15k      Email / Wha
 ## Étape 4 — CONTACT ÉDITEUR (Passage à l'abonnement)
 
 **Canaux affichés sur page de vente :**
-- **Email :** `fayna@jaayleer.com` (ou adresse dédiée)
-- **WhatsApp :** `+221 77 000 00 00` (numéro éditeur)
+- **Email :** `contact@jaayleer.com`
+- **WhatsApp :** `+221 78 426 65 46` (contact canonique Jaayleer)
 
 **Échange type (2-5 min) :**
 1. Prospect choisit Solo ou Pro.
