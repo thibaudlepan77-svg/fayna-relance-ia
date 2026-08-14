@@ -1,0 +1,27 @@
+{
+  "name": "fayna-relance-ia",
+  "version": "1.0.0",
+  "description": "Petit produit **autonome** et **vendable** : un outil web mono-fichier qui aide les PME et commerçants du Sénégal à récupérer leurs impayés. On saisit qui doit combien, FAYNA rédige le bon message de relance (bon ton, escalade graduée), **en français et en wolof**, prêt à envoyer par **WhatsApp** en un clic.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thibaudlepan77-svg/fayna-relance-ia.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/thibaudlepan77-svg/fayna-relance-ia/issues"
+  },
+  "homepage": "https://github.com/thibaudlepan77-svg/fayna-relance-ia#readme",
+  "devDependencies": {
+    "vercel": "^59.0.0"
+  }
+}
