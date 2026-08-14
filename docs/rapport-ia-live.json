@@ -1,0 +1,77 @@
+{
+  "date": "2026-07-10 00:59",
+  "fournisseurs": {
+    "groq": {
+      "appels": 12,
+      "ok": 9,
+      "ko": 3,
+      "erreurs": {
+        "réponse vide du fournisseur": 3
+      }
+    },
+    "gemini": {
+      "appels": 12,
+      "ok": 12,
+      "ko": 0,
+      "erreurs": {}
+    }
+  },
+  "appels": 24,
+  "reussis": 21,
+  "echoues": 3,
+  "fauxAccepts": [],
+  "fauxRejets": [
+    {
+      "prov": "groq",
+      "cas": "Boutique Ndiaye",
+      "motifs": [
+        "IA_LONGUEUR",
+        "IA_ACCENTS_PERDUS",
+        "IA_WOLOF_PERDU"
+      ]
+    },
+    {
+      "prov": "groq",
+      "cas": "Ets Fall et Frères",
+      "motifs": [
+        "IA_WOLOF_PERDU"
+      ]
+    },
+    {
+      "prov": "gemini",
+      "cas": "Ets Fall et Frères",
+      "motifs": [
+        "IA_LEXIQUE_INTERDIT"
+      ]
+    }
+  ],
+  "injections": {
+    "total": 11,
+    "modeleObeit": 7,
+    "gardeFouArrete": 7,
+    "modeleRefuse": 4
+  },
+  "latences": [
+    1719,
+    1336,
+    2169,
+    1971,
+    1348,
+    924,
+    1163,
+    770,
+    1101,
+    1002,
+    1940,
+    1868,
+    1917,
+    1873,
+    1920,
+    950,
+    943,
+    846,
+    1054,
+    909,
+    1275
+  ]
+}

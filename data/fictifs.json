@@ -1,0 +1,45 @@
+{
+  "debitors": [
+    {
+      "name": "Boutique Ndiaye",
+      "phone": "221771234567",
+      "amount": 150000,
+      "dueDate": "J-22",
+      "daysOverdue": 22,
+      "escalationLevel": 3, // Relance ferme
+      "relationship": "habituel",
+      "language": "fr",
+      "paymentChannel": "Wave",
+      "notes": "Retard récurrent, mais client fidèle."
+    },
+    {
+      "name": "Ets Fall & Frères",
+      "phone": "221772345678",
+      "amount": 640000,
+      "dueDate": "J-47",
+      "daysOverdue": 47,
+      "escalationLevel": 4, // Mise en demeure amiable
+      "relationship": "sensible",
+      "language": "fr",
+      "paymentChannel": "Orange Money",
+      "notes": "Marché public, État mauvais payeur (~200 j)."
+    },
+    {
+      "name": "Clinique Teranga",
+      "phone": "221773456789",
+      "amount": 90000,
+      "dueDate": "J-3",
+      "daysOverdue": 3,
+      "escalationLevel": 1, // Premier rappel
+      "relationship": "nouveau",
+      "language": "wolof",
+      "paymentChannel": "Wave",
+      "notes": "Nouveau client, premier retard."
+    }
+  ],
+  "settings": {
+    "signature": "Entreprise Diallo & Fils",
+    "paymentChannel": "Wave ou Orange Money",
+    "location": "Dakar"
+  }
+}

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAYNA — Relancez vos impayés en 1 clic | Sénégal</title>
+  <meta name="description" content="FAYNA aide les PME et commerçants du Sénégal à récupérer leurs impayés avec des relances automatiques en français et wolof, prêtes à envoyer par WhatsApp.">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #f59e0b;
+      --dark: #1f2937;
+      --light: #f9fafb;
+      --gray: #6b7280;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      margin: 0;
+      padding: 0;
+      background-color: var(--light);
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    header {
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    .logo span {
+      color: var(--secondary);
+    }
+    nav a {
+      text-decoration: none;
+      color: var(--dark);
+      margin-left: 1.5rem;
+      font-weight: 500;
+    }
+    nav a:hover {
+      color: var(--primary);
+    }
+    .hero {
+      text-align: center;
+      padding: 4rem 0;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    .cta-button {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .cta-button:hover {
+      background: var(--primary-dark);
+    }
+    .cta-secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      margin-left: 1rem;
+    }
+    .section {
+      padding: 3rem 0;
+    }
+    .section h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+      text-align: center;
+    }
+    .section p {
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .feature {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .feature i {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .pricing-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+      position: relative;
+    }
+    .pricing-card.popular {
+      border: 2px solid var(--primary);
+    }
+    .pricing-card.popular .popular-badge {
+      position: absolute;
+      top: -1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .price {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 1rem 0;
+    }
+    .price span {
+      font-size: 1rem;
+      color: var(--gray);
+      font-weight: normal;
+    }
+    .features-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+    }
+    .features-list li {
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+    }
+    .features-list li::before {
+      content: "✓";
+      color: var(--primary);
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+    footer {
+      background: var(--dark);
+      color: white;
+      padding: 2rem 0;
+      text-align: center;
+    }
+    .dashboard-preview {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+      margin: 2rem auto;
+      max-width: 600px;
+    }
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .kpi-item {
+      padding: 1rem;
+      background: var(--light);
+      border-radius: 0.5rem;
+    }
+    .kpi-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    .kpi-label {
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .kpi {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">FAYNA<span>.</span></div>
+      <nav>
+        <a href="#objections">Objections</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Vos clients vous doivent de l'argent ?</h1>
+      <p>FAYNA relance vos impayés à votre place, en français et en wolof, prêt à envoyer par WhatsApp en 1 clic.</p>
+      <a href="demo.html" class="cta-button">Essayer la démo gratuite</a>
+      <a href="#prix" class="cta-button cta-secondary">Voir les prix</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>La douleur n°1 des PME sénégalaises</h2>
+      <p>Les retards de paiement étouffent votre trésorerie. Vous passez des heures à relancer, mais :</p>
+      <div class="features">
+        <div class="feature">
+          <i>⏳</i>
+          <h3>Vous oubliez des clients</h3>
+          <p>Entre les appels et les messages, impossible de suivre tout le monde.</p>
+        </div>
+        <div class="feature">
+          <i>💔</i>
+          <h3>Vous perdez des relations</h3>
+          <p>Relancer à la main, c'est risquer de froisser ou d'être trop mou.</p>
+        </div>
+        <div class="feature">
+          <i>📉</i>
+          <h3>Votre argent dort</h3>
+          <p>Chaque jour de retard = cash en moins pour payer vos fournisseurs ou investir.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>FAYNA : la solution clé en main</h2>
+      <p>Un outil web qui prépare vos relances, avec le bon ton et la bonne cadence. Vous cliquez, vous envoyez, vous encaissez.</p>
+
+      <div class="dashboard-preview">
+        <div class="kpi">
+          <div class="kpi-item">
+            <div class="kpi-value">880 000 FCFA</div>
+            <div class="kpi-label">Total dû</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-value">3</div>
+            <div class="kpi-label">Relances envoyées</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-value">47 jours</div>
+            <div class="kpi-label">Plus ancien retard</div>
+          </div>
+        </div>
+        <p style="text-align: center; color: var(--gray); font-size: 0.9rem;">Tableau de bord FAYNA — priorisation automatique</p>
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <i>📊</i>
+          <h3>5 niveaux d'escalade</h3>
+          <p>Rappel préventif → relance ferme → mise en demeure OHADA.</p>
+        </div>
+        <div class="feature">
+          <i>🌍</i>
+          <h3>Bilingue FR / Wolof</h3>
+          <p>Messages adaptés à la relation (habituel, nouveau, délicat).</p>
+        </div>
+        <div class="feature">
+          <i>📱</i>
+          <h3>1 clic WhatsApp</h3>
+          <p>Lien <code>wa.me</code> pré-rempli, prêt à envoyer.</p>
+        </div>
+        <div class="feature">
+          <i>🔒</i>
+          <h3>100 % hors-ligne</h3>
+          <p>Aucune donnée ne sort de votre navigateur.</p>
+        </div>
+        <div class="feature">
+          <i>🤖</i>
+          <h3>IA optionnelle (BYOK)</h3>
+          <p>Personnalisez les messages avec votre clé gratuite (Groq/Gemini).</p>
+        </div>
+        <div class="feature">
+          <i>📄</i>
+          <h3>Export CSV</h3>
+          <p>Récupérez votre portefeuille d'impayés à tout moment.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="prix">
+    <div class="container">
+      <h2>Prix public (FCFA/mois)</h2>
+      <p>Choisissez l'offre qui correspond à votre activité. Aucun engagement, arrêtez quand vous voulez.</p>
+
+      <div class="pricing">
+        <div class="pricing-card">
+          <h3>Solo</h3>
+          <p>Commerçant ou artisan seul</p>
+          <div class="price">5 000 <span>FCFA/mois</span></div>
+          <ul class="features-list">
+            <li>Relances illimitées, 5 niveaux</li>
+            <li>Messages bilingues FR / Wolof</li>
+            <li>Envoi WhatsApp en 1 clic</li>
+            <li>Tableau de bord des impayés</li>
+            <li>100 % hors-ligne</li>
+          </ul>
+          <a href="#contact" class="cta-button">Me contacter</a>
+        </div>
+
+        <div class="pricing-card popular">
+          <div class="popular-badge">Le plus populaire</div>
+          <h3>Pro</h3>
+          <p>PME formelle (10-60 employés)</p>
+          <div class="price">15 000 <span>FCFA/mois</span></div>
+          <ul class="features-list">
+            <li>Tout Solo</li>
+            <li>Personnalisation par l'IA (clé gratuite)</li>
+            <li>Priorisation par montant à risque</li>
+            <li>Export CSV du portefeuille</li>
+            <li>Modèles de mise en demeure OHADA</li>
+          </ul>
+          <a href="#contact" class="cta-button">Me contacter</a>
+        </div>
+      </div>
+
+      <p style="text-align: center; margin-top: 2rem;">
+        <strong>1 seul impayé de 150 000 FCFA récupéré = ROI 30x sur l'année Solo.</strong>
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="objections">
+    <div class="container">
+      <h2>Réponses aux objections</h2>
+      <p>Vous vous dites peut-être :</p>
+
+      <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 2rem 0;">
+        <h3>« Mes clients paient déjà, je n'ai pas besoin de relance. »</h3>
+        <p><strong>Réponse :</strong> Les PME qui systématisent la relance récupèrent <strong>30 % d'impayés en plus</strong>. FAYNA ne relance pas à votre place — il vous donne <strong>le bon message au bon moment</strong>, en 1 clic WhatsApp. Ce que vous faites à la main pour 3 clients, FAYNA le fait pour 30 sans que vous oubliiez personne.</p>
+      </div>
+
+      <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 2rem 0;">
+        <h3>« WhatsApp suffit, j'envoie déjà mes messages comme ça. »</h3>
+        <p><strong>Réponse :</strong> WhatsApp est le <em>canal</em>, FAYNA est la <em>structure</em>. Gain de temps ×5 : vous ne réécrivez plus chaque message. Nom, montant, date, canal, signature — tout est pré-rempli. 3 relations × 2 langues × 5 niveaux = <strong>30 gabarits prêts</strong>.</p>
+      </div>
+
+      <p style="text-align: center; margin-top: 2rem;">
+        <a href="OBJECTIONS.md" style="color: var(--primary);">Voir les 5 objections fréquentes et leurs réponses →</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="container">
+      <h2>Prêt à récupérer vos impayés ?</h2>
+      <p>Contactez-nous pour activer votre abonnement. Réponse sous 24h.</p>
+
+      <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 2rem;">
+        <div style="text-align: center;">
+          <i style="font-size: 2rem; color: var(--primary);">✉️</i>
+          <p>Email</p>
+          <a href="mailto:fayna@jaayleer.com" style="color: var(--primary);">fayna@jaayleer.com</a>
+        </div>
+        <div style="text-align: center;">
+          <i style="font-size: 2rem; color: var(--primary);">💬</i>
+          <p>WhatsApp</p>
+          <a href="https://wa.me/221770000000" style="color: var(--primary);">+221 77 000 00 00</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 FAYNA. Tous droits réservés.</p>
+      <p style="font-size: 0.9rem; color: #d1d5db;">
+        Aucune donnée client n'est transmise à un serveur. IA optionnelle (clé gratuite du client). Pas d'engagement.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAYNA — Démo gratuite | Relancez vos impayés en 1 clic</title>
+  <meta name="description" content="Démo gratuite de FAYNA : testez l'outil de relance d'impayés pour PME et commerçants du Sénégal.">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #f59e0b;
+      --dark: #1f2937;
+      --light: #f9fafb;
+      --gray: #6b7280;
+      --red: #ef4444;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      margin: 0;
+      padding: 0;
+      background-color: var(--light);
+    }
+    .demo-banner {
+      background: var(--secondary);
+      color: white;
+      text-align: center;
+      padding: 0.5rem;
+      font-weight: 600;
+    }
+    .demo-banner i {
+      margin-right: 0.5rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    header {
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+    }
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    .logo span {
+      color: var(--secondary);
+    }
+    .tabs {
+      display: flex;
+      margin: 1rem 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab.active {
+      border-bottom-color: var(--primary);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .tab-content {
+      display: none;
+      padding: 1rem 0;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .debtor-card {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .debtor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .debtor-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .debtor-amount {
+      font-weight: bold;
+      color: var(--red);
+    }
+    .debtor-status {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .escalation-1 { background: #fef3c7; color: #92400e; }
+    .escalation-2 { background: #fed7aa; color: #9a3412; }
+    .escalation-3 { background: #fecaca; color: #991b1b; }
+    .escalation-4 { background: #fca5a5; color: #991b1b; }
+    .escalation-5 { background: #f87171; color: white; }
+    .debtor-meta {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+    .message-preview {
+      background: var(--light);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin: 1rem 0;
+      white-space: pre-wrap;
+    }
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .action-button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .primary { background: var(--primary); color: white; }
+    .secondary { background: var(--light); color: var(--dark); }
+    .danger { background: var(--red); color: white; }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .dashboard-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .dashboard-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      margin: 10% auto;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      max-width: 600px;
+      position: relative;
+    }
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray);
+    }
+    @media (max-width: 600px) {
+      .debtor-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-banner">
+    <i>🎯</i> Démo gratuite — Données fictives
+  </div>
+
+  <header>
+    <div class="container">
+      <div class="logo">FAYNA<span>.</span></div>
+      <div>
+        <button class="action-button secondary" onclick="resetDemo()">Réinitialiser la démo</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('dashboard')">Tableau de bord</div>
+      <div class="tab" onclick="switchTab('debtors')">Débiteurs</div>
+      <div class="tab" onclick="switchTab('settings')">Réglages</div>
+    </div>
+
+    <div id="dashboard" class="tab-content active">
+      <h2>Tableau de bord</h2>
+      <div class="dashboard">
+        <div class="dashboard-card">
+          <div class="dashboard-value" id="total-due">0 FCFA</div>
+          <div>Total dû</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-value" id="total-debtors">0</div>
+          <div>Débiteurs</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-value" id="oldest-overdue">0 jours</div>
+          <div>Plus ancien retard</div>
+        </div>
+      </div>
+
+      <h3>Priorité absolue</h3>
+      <div id="priority-debtor"></div>
+    </div>
+
+    <div id="debtors" class="tab-content">
+      <h2>Débiteurs</h2>
+      <div id="debtors-list"></div>
+      <button class="action-button primary" onclick="openAddDebtorModal()">Ajouter un client</button>
+    </div>
+
+    <div id="settings" class="tab-content">
+      <h2>Réglages</h2>
+      <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="margin-bottom: 1rem;">
+          <label for="signature">Signature :</label>
+          <input type="text" id="signature" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label for="payment-channel">Canal de paiement :</label>
+          <input type="text" id="payment-channel" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+        </div>
+        <div>
+          <label for="location">Lieu (pour mise en demeure) :</label>
+          <input type="text" id="location" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+        </div>
+        <button class="action-button primary" onclick="saveSettings()" style="margin-top: 1rem;">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Ajouter un débiteur -->
+  <div id="addDebtorModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeAddDebtorModal()">&times;</span>
+      <h2>Ajouter un client</h2>
+      <form id="addDebtorForm">
+        <div style="margin-bottom: 1rem;">
+          <label for="debtor-name">Nom :</label>
+          <input type="text" id="debtor-name" required style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label for="debtor-phone">Téléphone (WhatsApp) :</label>
+          <input type="text" id="debtor-phone" required style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label for="debtor-amount">Montant dû (FCFA) :</label>
+          <input type="number" id="debtor-amount" required style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label for="debtor-due-date">Échéance (JJ/MM/AAAA) :</label>
+          <input type="text" id="debtor-due-date" required style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;" placeholder="Ex: 15/08/2026">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label for="debtor-relationship">Relation :</label>
+          <select id="debtor-relationship" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+            <option value="habituel">Habituel</option>
+            <option value="nouveau">Nouveau</option>
+            <option value="sensible">Délicat</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label for="debtor-language">Langue :</label>
+          <select id="debtor-language" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+            <option value="fr">Français</option>
+            <option value="wolof">Wolof</option>
+            <option value="fr+wolof">Français + Wolof</option>
+          </select>
+        </div>
+        <button type="submit" class="action-button primary">Ajouter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Message -->
+  <div id="messageModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeMessageModal()">&times;</span>
+      <h2>Message de relance</h2>
+      <div class="tabs">
+        <div class="tab active" onclick="switchMessageTab('fr')">Français</div>
+        <div class="tab" onclick="switchMessageTab('wolof')">Wolof</div>
+      </div>
+      <div id="message-fr" class="tab-content active message-preview"></div>
+      <div id="message-wolof" class="tab-content message-preview"></div>
+      <div class="actions">
+        <button class="action-button primary" onclick="sendWhatsApp()">Envoyer par WhatsApp</button>
+        <button class="action-button secondary" onclick="copyToClipboard()">Copier</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>Démo gratuite — Aucune donnée n'est envoyée.</p>
+      <p><a href="index.html" style="color: var(--primary);">Retour à la page de vente →</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // Données fictives (chargées depuis localStorage ou data/fictifs.json)
+    let debtors = [];
+    let settings = {
+      signature: "Entreprise Diallo & Fils",
+      paymentChannel: "Wave ou Orange Money",
+      location: "Dakar"
+    };
+
+    // Templates de messages (simplifiés pour la démo)
+    const messageTemplates = {
+      fr: {
+        1: {
+          habituel: "Bonjour {name},\n\nNous constatons que la facture de {amount} FCFA, échue le {dueDate}, n'a pas encore été réglée. Pouvez-vous nous confirmer le paiement ou nous indiquer une date de règlement ?\n\nMerci d'avance,\n{signature}",
+          nouveau: "Bonjour {name},\n\nNous espérons que vous allez bien. Nous vous rappelons que la facture de {amount} FCFA, échue le {dueDate}, reste impayée. Pourriez-vous nous confirmer le règlement ?\n\nCordialement,\n{signature}",
+          sensible: "Bonjour {name},\n\nNous comprenons que les retards de paiement peuvent arriver. Cependant, la facture de {amount} FCFA, échue le {dueDate}, n'a toujours pas été réglée. Pouvez-vous nous donner une date précise de paiement ?\n\nBien à vous,\n{signature}"
+        },
+        2: {
+          habituel: "Bonjour {name},\n\nMalgré notre précédent rappel, la facture de {amount} FCFA, échue le {dueDate}, reste impayée. Nous vous serions gré de bien vouloir régulariser cette situation sous 7 jours.\n\nCordialement,\n{signature}",
+          nouveau: "Bonjour {name},\n\nNous vous avons déjà rappelé que la facture de {amount} FCFA, échue le {dueDate}, n'a pas été réglée. Nous comptons sur votre paiement sous 7 jours.\n\nBien cordialement,\n{signature}",
+          sensible: "Bonjour {name},\n\nNous avons déjà échangé sur la facture de {amount} FCFA, échue le {dueDate}, toujours impayée. Nous vous demandons de régulariser cette situation sous 7 jours.\n\nRespectueusement,\n{signature}"
+        },
+        3: {
+          habituel: "Bonjour {name},\n\nNous constatons que malgré nos relances, la facture de {amount} FCFA, échue le {dueDate}, n'a toujours pas été réglée. Nous vous demandons de procéder au paiement sous 3 jours.\n\nCordialement,\n{signature}",
+          nouveau: "Bonjour {name},\n\nMalgré nos précédents échanges, la facture de {amount} FCFA, échue le {dueDate}, reste impayée. Nous vous demandons de régulariser sous 3 jours.\n\nBien à vous,\n{signature}",
+          sensible: "Bonjour {name},\n\nNous avons déjà effectué plusieurs relances pour la facture de {amount} FCFA, échue le {dueDate}. Nous vous demandons de procéder au paiement sous 3 jours.\n\nRespectueusement,\n{signature}"
+        },
+        4: {
+          habituel: "Bonjour {name},\n\nMalgré nos multiples relances, la facture de {amount} FCFA, échue le {dueDate}, n'a pas été réglée. Nous vous adressons cette mise en demeure amiable de payer sous 8 jours, conformément à l'Acte Uniforme OHADA.\n\nÀ défaut, nous nous réservons le droit d'engager des poursuites sans autre formalité.\n\nCordialement,\n{signature}",
+          nouveau: "Bonjour {name},\n\nNous vous mettons en demeure de régler la facture de {amount} FCFA, échue le {dueDate}, sous 8 jours. Passé ce délai, nous engagerons des poursuites sans autre avertissement.\n\nBien à vous,\n{signature}",
+          sensible: "Bonjour {name},\n\nNous vous adressons cette mise en demeure pour le règlement de la facture de {amount} FCFA, échue le {dueDate}, sous 8 jours. Nous espérons éviter toute action contentieuse.\n\nRespectueusement,\n{signature}"
+        },
+        5: {
+          habituel: "Bonjour {name},\n\nDernier rappel : la facture de {amount} FCFA, échue le {dueDate}, reste impayée. À défaut de règlement sous 48h, nous engagerons des poursuites sans autre avertissement.\n\nCordialement,\n{signature}",
+          nouveau: "Bonjour {name},\n\nDernier rappel pour la facture de {amount} FCFA, échue le {dueDate}. Paiement sous 48h, sinon poursuites immédiates.\n\nBien à vous,\n{signature}",
+          sensible: "Bonjour {name},\n\nDernier rappel pour la facture de {amount} FCFA, échue le {dueDate}. Nous espérons un règlement sous 48h pour éviter toute action contentieuse.\n\nRespectueusement,\n{signature}"
+        }
+      },
+      wolof: {
+        1: {
+          habituel: "Salaam aleikum {name},\n\nNdaxte naa xam ne facture bi {amount} FCFA, nga wax ne nga ko ko bari le {dueDate}, amul dara. Ndax mën nga wax ne nga ko ko bari te nga niataanga ci jamono ji ?\n\nJërejëf,\n{signature}",
+          nouveau: "Salaam aleikum {name},\n\nNuyoo ci jamono ji. Xam naa ne facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Ndax mën nga wax ne nga ko ko bari ?\n\nJërejëf,\n{signature}",
+          sensible: "Salaam aleikum {name},\n\nXam naa ne ñu bare nañu ci jëf ji. Waaye facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Ndax mën nga wax ne nga niataange jamono ji nga ko bari ?\n\nJërejëf,\n{signature}"
+        },
+        2: {
+          habituel: "Salaam aleikum {name},\n\nDama xam ne nga waxoon naa la ne facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Ndax mën nga ko bari ci 7 fan ?\n\nJërejëf,\n{signature}",
+          nouveau: "Salaam aleikum {name},\n\nXam naa ne nga waxoon naa la ne facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Ndax mën nga ko bari ci 7 fan ?\n\nJërejëf,\n{signature}",
+          sensible: "Salaam aleikum {name},\n\nXam naa ne ñu bare nañu ci facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate}. Ndax mën nga ko bari ci 7 fan ?\n\nJërejëf,\n{signature}"
+        },
+        3: {
+          habituel: "Salaam aleikum {name},\n\nDama xam ne nga waxoon naa la ne facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Ndax mën nga ko bari ci 3 fan ?\n\nJërejëf,\n{signature}",
+          nouveau: "Salaam aleikum {name},\n\nXam naa ne nga waxoon naa la ne facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Ndax mën nga ko bari ci 3 fan ?\n\nJërejëf,\n{signature}",
+          sensible: "Salaam aleikum {name},\n\nXam naa ne ñu bare nañu ci facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate}. Ndax mën nga ko bari ci 3 fan ?\n\nJërejëf,\n{signature}"
+        },
+        4: {
+          habituel: "Salaam aleikum {name},\n\nDama xam ne nga waxoon naa la ne facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Dama la jot naa ci mise en demeure amiable. Ndax mën nga ko bari ci 8 fan ?\n\nJërejëf,\n{signature}",
+          nouveau: "Salaam aleikum {name},\n\nXam naa ne nga waxoon naa la ne facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Dama la jot naa ci mise en demeure. Ndax mën nga ko bari ci 8 fan ?\n\nJërejëf,\n{signature}",
+          sensible: "Salaam aleikum {name},\n\nXam naa ne ñu bare nañu ci facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate}. Dama la jot naa ci mise en demeure amiable. Ndax mën nga ko bari ci 8 fan ?\n\nJërejëf,\n{signature}"
+        },
+        5: {
+          habituel: "Salaam aleikum {name},\n\nDernier rappel : facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Ndax mën nga ko bari ci 48 waxtu ?\n\nJërejëf,\n{signature}",
+          nouveau: "Salaam aleikum {name},\n\nDernier rappel : facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Ndax mën nga ko bari ci 48 waxtu ?\n\nJërejëf,\n{signature}",
+          sensible: "Salaam aleikum {name},\n\nDernier rappel : facture bi {amount} FCFA nga wax ne nga ko bari le {dueDate} amul dara. Ndax mën nga ko bari ci 48 waxtu ?\n\nJërejëf,\n{signature}"
+        }
+      }
+    };
+
+    // Charger les données au démarrage
+    document.addEventListener('DOMContentLoaded', function() {
+      loadData();
+      renderDashboard();
+      renderDebtors();
+      renderSettings();
+    });
+
+    // Charger les données depuis localStorage ou les données fictives
+    function loadData() {
+      const savedDebtors = localStorage.getItem('fayna-debtors');
+      const savedSettings = localStorage.getItem('fayna-settings');
+
+      if (savedDebtors) {
+        debtors = JSON.parse(savedDebtors);
+      } else {
+        // Données fictives (simulées depuis data/fictifs.json)
+        debtors = [
+          {
+            name: "Boutique Ndiaye",
+            phone: "221771234567",
+            amount: 150000,
+            dueDate: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+            daysOverdue: 22,
+            escalationLevel: 3,
+            relationship: "habituel",
+            language: "fr",
+            paymentChannel: "Wave",
+            notes: "Retard récurrent, mais client fidèle.",
+            history: [
+              { date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'), action: "Premier rappel envoyé" },
+              { date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'), action: "Relance ferme envoyée" }
+            ]
+          },
+          {
+            name: "Ets Fall & Frères",
+            phone: "221772345678",
+            amount: 640000,
+            dueDate: new Date(Date.now() - 47 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+            daysOverdue: 47,
+            escalationLevel: 4,
+            relationship: "sensible",
+            language: "fr",
+            paymentChannel: "Orange Money",
+            notes: "Marché public, État mauvais payeur (~200 j).",
+            history: [
+              { date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'), action: "Premier rappel envoyé" },
+              { date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'), action: "Relance ferme envoyée" },
+              { date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'), action: "Mise en demeure envoyée" }
+            ]
+          },
+          {
+            name: "Clinique Teranga",
+            phone: "221773456789",
+            amount: 90000,
+            dueDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
+            daysOverdue: 3,
+            escalationLevel: 1,
+            relationship: "nouveau",
+            language: "wolof",
+            paymentChannel: "Wave",
+            notes: "Nouveau client, premier retard.",
+            history: []
+          }
+        ];
+      }
+
+      if (savedSettings) {
+        settings = JSON.parse(savedSettings);
+      }
+    }
+
+    // Sauvegarder les données dans localStorage
+    function saveData() {
+      localStorage.setItem('fayna-debtors', JSON.stringify(debtors));
+      localStorage.setItem('fayna-settings', JSON.stringify(settings));
+    }
+
+    // Réinitialiser la démo
+    function resetDemo() {
+      if (confirm("Voulez-vous vraiment réinitialiser la démo ? Toutes les données seront effacées.")) {
+        localStorage.removeItem('fayna-debtors');
+        localStorage.removeItem('fayna-settings');
+        loadData();
+        renderDashboard();
+        renderDebtors();
+        renderSettings();
+        alert("Démo réinitialisée !");
+      }
+    }
+
+    // Changer d'onglet
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Changer d'onglet dans le modal message
+    function switchMessageTab(lang) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`message-${lang}`).classList.add('active');
+    }
+
+    // Rendre le tableau de bord
+    function renderDashboard() {
+      const totalDue = debtors.reduce((sum, debtor) => sum + debtor.amount, 0);
+      const oldestOverdue = Math.max(...debtors.map(debtor => debtor.daysOverdue));
+
+      document.getElementById('total-due').textContent = `${totalDue.toLocaleString('fr-FR')} FCFA`;
+      document.getElementById('total-debtors').textContent = debtors.length;
+      document.getElementById('oldest-overdue').textContent = `${oldestOverdue} jours`;
+
+      // Priorité absolue (montant × ancienneté)
+      if (debtors.length > 0) {
+        const priorityDebtor = debtors.reduce((prev, current) =>
+          (prev.amount * prev.daysOverdue) > (current.amount * current.daysOverdue) ? prev : current
+        );
+
+        const priorityHtml = `
+          <div class="debtor-card">
+            <div class="debtor-header">
+              <div class="debtor-name">${priorityDebtor.name}</div>
+              <div class="debtor-amount">${priorityDebtor.amount.toLocaleString('fr-FR')} FCFA</div>
+            </div>
+            <div class="debtor-meta">
+              <span>Retard : ${priorityDebtor.daysOverdue} jours</span>
+              <span class="debtor-status escalation-${priorityDebtor.escalationLevel}">Niveau ${priorityDebtor.escalationLevel}</span>
+            </div>
+            <div class="actions">
+              <button class="action-button primary" onclick="openMessageModal('${priorityDebtor.name}', ${priorityDebtor.amount}, '${priorityDebtor.dueDate}', ${priorityDebtor.escalationLevel}, '${priorityDebtor.relationship}', '${priorityDebtor.language}')">Envoyer relance</button>
+              <button class="action-button secondary" onclick="editDebtor('${priorityDebtor.name}')">Modifier</button>
+            </div>
+          </div>
+        `;
+        document.getElementById('priority-debtor').innerHTML = priorityHtml;
+      }
+    }
+
+    // Rendre la liste des débiteurs
+    function renderDebtors() {
+      const debtorsList = document.getElementById('debtors-list');
+      debtorsList.innerHTML = '';
+
+      // Trier par priorité (montant × ancienneté)
+      const sortedDebtors = [...debtors].sort((a, b) => (b.amount * b.daysOverdue) - (a.amount * a.daysOverdue));
+
+      sortedDebtors.forEach(debtor => {
+        const debtorHtml = `
+          <div class="debtor-card">
+            <div class="debtor-header">
+              <div class="debtor-name">${debtor.name}</div>
+              <div class="debtor-amount">${debtor.amount.toLocaleString('fr-FR')} FCFA</div>
+            </div>
+            <div class="debtor-meta">
+              <span>Retard : ${debtor.daysOverdue} jours</span>
+              <span>Échéance : ${debtor.dueDate}</span>
+              <span class="debtor-status escalation-${debtor.escalationLevel}">Niveau ${debtor.escalationLevel}</span>
+            </div>
+            <div><strong>Notes :</strong> ${debtor.notes}</div>
+            <div class="actions">
+              <button class="action-button primary" onclick="openMessageModal('${debtor.name}', ${debtor.amount}, '${debtor.dueDate}', ${debtor.escalationLevel}, '${debtor.relationship}', '${debtor.language}')">Envoyer relance</button>
+              <button class="action-button secondary" onclick="editDebtor('${debtor.name}')">Modifier</button>
+              <button class="action-button danger" onclick="deleteDebtor('${debtor.name}')">Supprimer</button>
+            </div>
+          </div>
+        `;
+        debtorsList.innerHTML += debtorHtml;
+      });
+    }
+
+    // Rendre les réglages
+    function renderSettings() {
+      document.getElementById('signature').value = settings.signature;
+      document.getElementById('payment-channel').value = settings.paymentChannel;
+      document.getElementById('location').value = settings.location;
+    }
+
+    // Sauvegarder les réglages
+    function saveSettings() {
+      settings.signature = document.getElementById('signature').value;
+      settings.paymentChannel = document.getElementById('payment-channel').value;
+      settings.location = document.getElementById('location').value;
+      saveData();
+      alert("Réglages enregistrés !");
+    }
+
+    // Ouvrir le modal pour ajouter un débiteur
+    function openAddDebtorModal() {
+      document.getElementById('addDebtorModal').style.display = 'block';
+    }
+
+    // Fermer le modal
+    function closeAddDebtorModal() {
+      document.getElementById('addDebtorModal').style.display = 'none';
+      document.getElementById('addDebtorForm').reset();
+    }
+
+    // Ajouter un débiteur
+    document.getElementById('addDebtorForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('debtor-name').value;
+      const phone = document.getElementById('debtor-phone').value;
+      const amount = parseInt(document.getElementById('debtor-amount').value);
+      const dueDate = document.getElementById('debtor-due-date').value;
+      const relationship = document.getElementById('debtor-relationship').value;
+      const language = document.getElementById('debtor-language').value;
+
+      // Calculer les jours de retard (simplifié)
+      const dueDateObj = new Date(dueDate.split('/').reverse().join('-'));
+      const daysOverdue = Math.floor((Date.now() - dueDateObj) / (24 * 60 * 60 * 1000));
+
+      // Déterminer le niveau d'escalade (simplifié)
+      let escalationLevel = 1;
+      if (daysOverdue > 30) escalationLevel = 4;
+      else if (daysOverdue > 15) escalationLevel = 3;
+      else if (daysOverdue > 7) escalationLevel = 2;
+
+      const newDebtor = {
+        name,
+        phone,
+        amount,
+        dueDate: dueDateObj.toLocaleDateString('fr-FR'),
+        daysOverdue,
+        escalationLevel,
+        relationship,
+        language,
+        paymentChannel: settings.paymentChannel.split(' ou ')[0], // Prend le premier canal
+        notes: "Nouveau client ajouté via la démo.",
+        history: []
+      };
+
+      debtors.push(newDebtor);
+      saveData();
+      renderDashboard();
+      renderDebtors();
+      closeAddDebtorModal();
+    });
+
+    // Modifier un débiteur
+    function editDebtor(name) {
+      const debtor = debtors.find(d => d.name === name);
+      if (!debtor) return;
+
+      document.getElementById('debtor-name').value = debtor.name;
+      document.getElementById('debtor-phone').value = debtor.phone;
+      document.getElementById('debtor-amount').value = debtor.amount;
+      document.getElementById('debtor-due-date').value = debtor.dueDate.split('/').reverse().join('-'); // Format YYYY-MM-DD
+      document.getElementById('debtor-relationship').value = debtor.relationship;
+      document.getElementById('debtor-language').value = debtor.language;
+
+      openAddDebtorModal();
+
+      // Supprimer l'ancien débiteur
+      debtors = debtors.filter(d => d.name !== name);
+    }
+
+    // Supprimer un débiteur
+    function deleteDebtor(name) {
+      if (confirm(`Voulez-vous vraiment supprimer ${name} ?`)) {
+        debtors = debtors.filter(d => d.name !== name);
+        saveData();
+        renderDashboard();
+        renderDebtors();
+      }
+    }
+
+    // Ouvrir le modal message
+    function openMessageModal(name, amount, dueDate, escalationLevel, relationship, language) {
+      const debtor = debtors.find(d => d.name === name);
+      if (!debtor) return;
+
+      // Générer les messages
+      const messageFr = generateMessage('fr', name, amount, dueDate, escalationLevel, relationship);
+      const messageWolof = generateMessage('wolof', name, amount, dueDate, escalationLevel, relationship);
+
+      document.getElementById('message-fr').textContent = messageFr;
+      document.getElementById('message-wolof').textContent = messageWolof;
+
+      // Stocker les données pour WhatsApp
+      window.currentDebtor = {
+        name,
+        phone: debtor.phone,
+        messageFr,
+        messageWolof,
+        language
+      };
+
+      document.getElementById('messageModal').style.display = 'block';
+    }
+
+    // Fermer le modal message
+    function closeMessageModal() {
+      document.getElementById('messageModal').style.display = 'none';
+    }
+
+    // Générer un message de relance
+    function generateMessage(lang, name, amount, dueDate, escalationLevel, relationship) {
+      const template = messageTemplates[lang][escalationLevel][relationship];
+      const formattedAmount = amount.toLocaleString('fr-FR');
+
+      return template
+        .replace(/{name}/g, name)
+        .replace(/{amount}/g, formattedAmount)
+        .replace(/{dueDate}/g, dueDate)
+        .replace(/{signature}/g, settings.signature);
+    }
+
+    // Envoyer par WhatsApp
+    function sendWhatsApp() {
+      const debtor = window.currentDebtor;
+      let message = debtor.messageFr;
+
+      if (debtor.language === 'wolof') {
+        message = debtor.messageWolof;
+      } else if (debtor.language === 'fr+wolof') {
+        message = `${debtor.messageFr}\n\n---\n\n${debtor.messageWolof}`;
+      }
+
+      // Nettoyer le message pour l'URL
+      const cleanMessage = encodeURIComponent(message.replace(/\n/g, '\n'));
+      const whatsappUrl = `https://wa.me/${debtor.phone}?text=${cleanMessage}`;
+
+      window.open(whatsappUrl, '_blank');
+      closeMessageModal();
+    }
+
+    // Copier le message dans le presse-papiers
+    function copyToClipboard() {
+      const debtor = window.currentDebtor;
+      let message = debtor.messageFr;
+
+      if (debtor.language === 'wolof') {
+        message = debtor.messageWolof;
+      } else if (debtor.language === 'fr+wolof') {
+        message = `${debtor.messageFr}\n\n---\n\n${debtor.messageWolof}`;
+      }
+
+      navigator.clipboard.writeText(message).then(() => {
+        alert("Message copié dans le presse-papiers !");
+      });
+    }
+  </script>
+</body>
+</html>

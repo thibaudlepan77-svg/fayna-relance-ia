@@ -1,0 +1,40 @@
+{
+  "produit": "FAYNA",
+  "sousTitre": "Assistant de relance des impayes pour PME et commercants du Senegal",
+  "devise": "FCFA",
+  "note": "Grille de reference INTERNE (sert d'ancrage honnete au discours de vente). Aucun prix n'est facture par l'outil lui-meme : l'outil est autonome et fonctionne hors-ligne. La mise en vente et l'encaissement restent des actions de l'utilisateur.",
+  "offres": [
+    {
+      "code": "SOLO",
+      "nom": "Solo",
+      "cible": "Commercant ou artisan seul, jusqu'a 30 clients suivis",
+      "prixMensuel": 5000,
+      "inclus": [
+        "Relances illimitees, 5 niveaux d'escalade",
+        "Messages bilingues francais / wolof",
+        "Envoi en un clic par WhatsApp",
+        "Tableau de bord des impayes",
+        "100 % hors-ligne, aucune donnee envoyee"
+      ]
+    },
+    {
+      "code": "PRO",
+      "nom": "Pro",
+      "cible": "PME formelle 10-60 employes, clients illimites",
+      "prixMensuel": 15000,
+      "inclus": [
+        "Tout Solo",
+        "Personnalisation par l'IA (cle gratuite du client, sans surcout)",
+        "Priorisation des relances par montant a risque",
+        "Export CSV du portefeuille d'impayes",
+        "Modeles de mise en demeure amiable"
+      ]
+    }
+  ],
+  "sources": [
+    "ANSD RGE 2016 : ~2 500 a 7 500 PME formelles cibles, 75 % a Dakar.",
+    "Douleur documentee n1 des PME senegalaises : tresorerie / acces au financement (retards de paiement, Etat mauvais payeur ~200 j sur marches publics).",
+    "Wave ~7 M d'utilisateurs actifs ; WhatsApp = canal commercial n1 au Senegal.",
+    "Recouvrement amiable ouvert (relances, mise en demeure) ; le recouvrement force reste le monopole de l'huissier (procedures OHADA)."
+  ]
+}
