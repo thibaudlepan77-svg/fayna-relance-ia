@@ -723,14 +723,17 @@ if (E && typeof E.lignesCSV === "function") {
   ok(E.serialiserCSV([["a"]]) === "a", "CSV serialise : cas minimal sans echappement inutile");
 }
 
-/* ---------- 14. Cliquet sur la zone que Node n'execute JAMAIS ----------
-   La revue QA adverse du 2026-08-15 a mis le doigt sur un defaut structurel, pas ponctuel : tout
-   ce qui vit apres /*DEMO_END*​/ est garde par `if (typeof document === "undefined") return;`,
-   donc aucun harnais ne l'execute. Ce cycle en a sorti l'export CSV. Le reste (cablage DOM,
-   rendu, ecouteurs) y demeure et reste NON PROUVE — c'est ecrit tel quel dans DECISIONS.md.
-   Faute de pouvoir tout extraire aujourd'hui, on pose un cliquet : cette zone ne doit plus
-   GROSSIR. Toute logique metier ajoutee la fera echouer l'oracle, ce qui force a l'extraire
-   vers un bloc testable au lieu de l'enfouir dans un gestionnaire de clic. */
+/* ---------- 14. Budget de la zone de cablage DOM ----------
+   Histoire de ce controle, en deux temps. Le 2026-08-15 au matin, une revue QA adverse a montre
+   que tout ce qui vit apres /*DEMO_END*​/ est garde par `if (typeof document === "undefined")
+   return;`, donc qu'aucun harnais ne l'executait : on a pose un cliquet de taille, faute de
+   mieux. Un cliquet n'est pas une preuve, c'est un aveu — il gele le risque au lieu de le lever.
+   Le meme jour, `verifier-dom.js` a leve le risque : la zone est desormais EXECUTEE dans un vrai
+   DOM (jsdom) et pilotee au clic, 93 assertions, 13 mutations du cablage toutes detectees.
+   Le plafond reste, mais sa raison change : ce n'est plus « on ne sait pas tester ici », c'est
+   « la logique metier appartient au moteur ». Un calcul enfoui dans un gestionnaire de clic
+   n'est testable que par le DOM, ce qui est lent et indirect ; dans le moteur il est teste par
+   mutation. Le cliquet maintient cette pression architecturale. */
 const BUDGET_ZONE_NON_TESTEE = 27500; // octets. Mesure du 2026-08-15 : 27 299. Ne JAMAIS relever
                                       // ce plafond pour faire passer un ajout : extraire le code.
 const zoneDebut = html.indexOf("/*DEMO_END*/");
@@ -743,7 +746,7 @@ ok(zoneDebut !== -1 && zoneFin > zoneDebut, "bornes de la zone DOM identifiables
 const tailleZone = zoneDebut === -1 ? -1
   : Buffer.byteLength(html.slice(zoneDebut, zoneFin).replace(/\r\n/g, "\n"), "utf8");
 ok(tailleZone > 0 && tailleZone <= BUDGET_ZONE_NON_TESTEE,
-  "zone DOM non executee par Node sous son plafond (" + tailleZone + " / " + BUDGET_ZONE_NON_TESTEE + " octets)");
+  "zone de cablage DOM sous son plafond (" + tailleZone + " / " + BUDGET_ZONE_NON_TESTEE + " octets)");
 // Et le calcul du CSV n'y est PLUS : preuve que l'extraction de ce cycle n'a pas ete defaite.
 const zoneDom = zoneDebut === -1 ? "" : html.slice(zoneDebut, zoneFin);
 ok(zoneDom.indexOf("nb_relances") === -1,

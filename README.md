@@ -36,10 +36,19 @@ indépendamment.
 - `index.html` — la **page de vente** (prix, objections, CTA). Pas encore publiée, voir `DECISIONS.md` D1.
 - `docs/verifier-fayna.js` — oracle Node zéro-dépendance : structure, honnêteté, hors-ligne,
   et la **logique réelle du moteur** (formats FCFA/date, seuils d'escalade, téléphone, WhatsApp,
-  génération bilingue déterministe, garde-fou IA) plus la couche démo, la couche export CSV et un cliquet sur la zone DOM non testée. **393 contrôles verts,
+  génération bilingue déterministe, garde-fou IA) plus la couche démo, la couche export CSV et un
+  budget de taille sur la zone de câblage DOM. **393 contrôles verts,
   exit 0**. Cible surchargeable : `node docs/verifier-fayna.js <fichier>`.
 - `docs/rouge-moteur.js` — auto-test de l'oracle : 13 mutations injectées dans `demo.html`,
   **13 attrapées**. Un oracle vert ne prouve rien tant qu'on ne l'a pas vu virer au rouge.
+- `verifier-dom.js` — **harnais DOM** : charge `demo.html` dans un vrai navigateur headless
+  (jsdom), laisse la page s'exécuter comme chez un visiteur, puis **clique dedans**. Il couvre
+  les ~600 lignes de câblage que Node n'exécutait pas : amorçage, rendu, onglets de langue, lien
+  WhatsApp, mise en demeure, échéancier, plafond de la démo, échappement HTML, édition,
+  « tout effacer » et sa persistance, clé IA, et le **contenu réel du fichier CSV téléchargé**.
+  Il vérifie aussi qu'**aucun appel réseau** n'a lieu pendant un usage normal — la promesse du
+  pied de page devient une assertion. **107 assertions vertes**, `--rouge` : **15/15 mutations du
+  câblage attrapées**.
 - `verifier.js` — harnais de cohérence commerciale (contacts canoniques, prix accordés entre la
   page et le parcours, objections, aucune allégation juridique invérifiable, et le fait que les
   documents décrivent les **vraies** données fictives). **66 verts** hors ligne, **80 avec
@@ -60,6 +69,8 @@ node docs/rouge-moteur.js       # l'oracle sait-il virer au rouge ?  (13/13)
 node verifier.js                # cohérence commerciale       (66 verts)
 node verifier.js --rouge        # mutations sur les documents (24/24)
 node verifier.js --live         # + l'URL publique en direct  (80 verts)
+node verifier-dom.js            # la démo EXÉCUTÉE et cliquée (107 verts)
+node verifier-dom.js --rouge    # mutations du câblage DOM    (15/15)
 node docs/ia-c65.js             # couche IA, fetch simulé (hors-ligne)
 node docs/ia-live-c65.mjs       # couche IA en réel (ignoré proprement sans clé)
 ```

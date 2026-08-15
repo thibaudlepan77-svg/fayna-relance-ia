@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node docs/verifier-fayna.js && node docs/rouge-moteur.js && node verifier.js && node verifier.js --rouge",
+    "test": "node docs/verifier-fayna.js && node docs/rouge-moteur.js && node verifier.js && node verifier.js --rouge && node verifier-dom.js && node verifier-dom.js --rouge",
     "test:live": "node verifier.js --live"
   },
   "repository": {
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/thibaudlepan77-svg/fayna-relance-ia#readme",
   "devDependencies": {
+    "jsdom": "^30.0.1",
     "vercel": "^59.0.0"
   }
 }

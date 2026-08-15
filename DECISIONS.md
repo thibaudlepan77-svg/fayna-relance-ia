@@ -5,6 +5,93 @@
 
 ---
 
+## 2026-08-15 (cycle 3) — Auto-cadrage : lever la dette de preuve du câblage DOM
+
+### Faits vérifiés dans l'environnement, jamais supposés
+
+- `AXE-PRIORITAIRE.md` impose de prendre **le rang le plus haut non fini**. Le rang 1 n'est pas
+  fini (2 critères sur 5 manquants) — il n'est donc pas sautable.
+- `ETAT-RESUME.md` recommandait de passer au rang 2 « puisque le rang 1 ne peut plus avancer sans
+  Thibaud ». **Vérifié faux** : sa propre action n° 2 (la dette de preuve du câblage DOM) est du
+  rang 1 et ne dépend de personne. Le rang 1 pouvait avancer.
+- `docs/verifier-fayna.js` §14 posait un **cliquet de 27 500 octets** sur la zone d'après
+  `/*DEMO_END*/` en écrivant noir sur blanc que cette zone « reste NON PROUVÉE ». Mesure du jour :
+  27 299 octets, soit ~600 lignes de câblage jamais exécutées par un harnais (LEÇON 19 du cerveau).
+- Bibliothèque des 150 briques consultée (`STACK-REFERENCE.md`, `CATALOGUE.md`, `VOLUME-2.md`) :
+  **aucune brique d'outillage de test DOM** n'y figure, le catalogue couvre les briques produit.
+- `demo.html` est stocké en **CRLF** (1 786 fins de ligne, 0 LF seul) — donc un motif de mutation
+  multi-ligne écrit en `\n` ne matcherait rien.
+- jsdom **n'implémente pas** le *named getter* des formulaires (`form.nom`), que le gestionnaire
+  de soumission de la page utilise. Constaté à l'exécution, pas supposé.
+
+### Décisions tranchées, une ligne et sa raison
+
+- **C1. Le cycle reste au rang 1**, sur la dette de preuve du critère 3. Raison : on ne saute pas
+  un rang, et un critère déclaré FAIT sur une preuve incomplète est une dette, pas un acquis.
+- **C2. jsdom (MIT), pas un simulateur DOM maison.** Raison : « assembler avant d'écrire » ; la
+  page fait 10 affectations `innerHTML`, un faux DOM maison serait un faux témoin — il validerait
+  ma propre lecture du HTML au lieu du HTML. 37 paquets, licence permissive, `devDependencies`
+  seulement : l'artefact publié reste un fichier autoportant sans aucune dépendance.
+- **C3. On instrumente le NAVIGATEUR, jamais le produit.** `demo.html` est chargé exactement tel
+  qu'il est publié. Seuls sont fournis les manques de jsdom : `URL.createObjectURL`/`Blob` (qui
+  servent aussi à **capturer le CSV réellement téléchargé**), `scrollIntoView`, `print`,
+  `confirm`, `clipboard`, et le *named getter* des formulaires restitué via `form.elements` —
+  donc un champ mal nommé reste introuvable ici comme dans un vrai navigateur.
+- **C4. Chaque garde du harnais doit être prouvé capable de rougir** : 13 mutations injectées dans
+  le câblage, chacune doit faire échouer la suite. Raison : LEÇONS 18 et 19.
+- **C5. Une mutation qui ne change pas le fichier est un ÉCHEC, pas un succès.** Les motifs sont
+  normalisés en CRLF avant application, et un motif absent ou ambigu échoue bruyamment.
+  Raison : LEÇON 21, une mutation inerte compte pour un faux vert.
+- **C6. Le cliquet de 27 500 octets est CONSERVÉ, sa justification est réécrite.** Raison : il ne
+  couvre plus une ignorance (la zone est désormais exécutée et mutée), il maintient une pression
+  d'architecture — la logique métier appartient au moteur, où elle se teste par mutation, pas à un
+  gestionnaire de clic. Ne pas relever le plafond pour faire passer un ajout : extraire le code.
+- **C7. Aucune ligne de `demo.html` n'a été modifiée ce cycle.** Raison : l'artefact publié est
+  byte-identique à ce que les visiteurs voient ; la preuve devait s'adapter au produit, pas
+  l'inverse.
+
+### Preuves de ce cycle (toutes rejouées, aucune héritée)
+
+- `node verifier-dom.js` : **107 assertions vertes / 107**, 6 navigateurs pilotés au clic.
+- `node verifier-dom.js --rouge` : **15/15 mutations du câblage détectées**.
+- Preuves héritées rejouées avant d'être adoptées : oracle **393 verts**, `rouge-moteur` **13/13**,
+  `verifier.js` **66 verts** et **24/24** mutations, **80 verts en `--live`** (la page publique
+  répond et reste conforme). `npm test` enchaîne le tout, **exit 0**.
+- **Défaut réel trouvé par l'auto-test, dans ma propre suite** : la mutation « les modifications
+  d'un dossier ne sont plus enregistrées » n'était pas détectée. L'objet édité est muté en
+  mémoire, donc l'affichage restait juste alors que la sauvegarde était perdue — la modification
+  aurait disparu au rechargement. Assertion de persistance ajoutée, mutation désormais rouge.
+  *Afficher n'est pas enregistrer.*
+
+### Revue adverse, 3 relecteurs ciblés — 3 défauts réels dans le harnais, tous corrigés
+
+- **QA.** « Tu constates l'absence d'erreur JS **au chargement**, jamais après les clics. » Exact :
+  une exception levée dans un gestionnaire de clic est avalée par le navigateur, l'interface se
+  fige à moitié rendue et personne n'est prévenu. Un bilan de fin de scénario a été ajouté, il
+  rejuge les erreurs **après** les interactions.
+- **Vie privée.** « Le pied de page promet au visiteur, et à la loi 2008-12, qu'aucune donnée ne
+  part vers un serveur. Rien ne le vérifie. » Exact : `fetch` est désormais instrumenté et compté,
+  et **aucun appel réseau** ne doit survenir pendant un usage normal. Mutation associée : un
+  mouchard injecté au chargement fait rougir la suite.
+- **Commercial (LEÇON 20).** « Le pire défaut d'une démo n'est pas un bug, c'est un cul-de-sac. Un
+  visiteur qui clique sur *Tout effacer* voit une page vide — et rien ne prouve qu'il peut revenir
+  à l'exemple. » Exact : le retour par « charger l'exemple » après effacement est maintenant
+  vérifié, avec sa mutation.
+
+### Ce que ce harnais couvre, et que rien ne couvrait avant
+
+Amorçage automatique des 3 débiteurs fictifs · tri par coût d'ignorance · les 3 KPI calculés ·
+les seuils d'escalade rendus · le message réellement rédigé · **le lien WhatsApp identique
+caractère pour caractère au texte affiché** · bascule de langue et sa persistance · historique de
+relances · cadence conseillée · mise en demeure (ouverture, contenu, montant en toutes lettres,
+fermeture par Échap) · échéancier négocié (tableau calculé, total égal à la dette, recalcul au
+changement de fréquence) · **contenu réel du fichier CSV téléchargé, colonne par colonne** ·
+champs obligatoires · échappement HTML d'un nom hostile · plafond de 5 dossiers · édition d'un
+dossier et sa persistance · « tout effacer » qui **ne se re-sème pas au rechargement** · clé IA
+jamais persistée sans consentement, et effacée quand l'utilisateur se ravise.
+
+---
+
 ## 2026-08-15 — Auto-cadrage (mode autonome, `cerveau\doctrine\regles-cadrage.md`)
 
 ### Faits vérifiés dans l'environnement, jamais supposés
