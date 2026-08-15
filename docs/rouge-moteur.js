@@ -42,8 +42,10 @@ const mutations = [
     (h) => h.replace('"Par la présente, nous vous mettons en demeure de régler cette " +',
       '"Par la présente, et conformément à l\'Acte uniforme OHADA, nous vous mettons en demeure de régler cette " +')],
 
+  // `\r?\n` et non `\n` : sur Windows, git livre le fichier en CRLF selon la branche d'ou l'on
+  // arrive, et la mutation devenait INERTE — elle ne modifiait rien et comptait comme un succes.
   ["un dossier fictif supprime (2 au lieu de 3)",
-    (h) => h.replace(/\{ nom: "Restaurant Teranga".*?\}\n/s, "")],
+    (h) => h.replace(/\{ nom: "Restaurant Teranga".*?\}\r?\n/s, "")],
 
   ["numero reel de Jaayleer glisse dans un dossier fictif",
     (h) => h.replace('tel: "771234567"', 'tel: "784266546"')],

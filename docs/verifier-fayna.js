@@ -736,7 +736,12 @@ const BUDGET_ZONE_NON_TESTEE = 27500; // octets. Mesure du 2026-08-15 : 27 299. 
 const zoneDebut = html.indexOf("/*DEMO_END*/");
 const zoneFin = html.lastIndexOf("</script>");
 ok(zoneDebut !== -1 && zoneFin > zoneDebut, "bornes de la zone DOM identifiables");
-const tailleZone = zoneDebut === -1 ? -1 : Buffer.byteLength(html.slice(zoneDebut, zoneFin), "utf8");
+// Les fins de ligne sont normalisees AVANT la mesure. Sans cela, un simple aller-retour entre
+// deux branches suffit a faire grossir la zone de ~600 octets sur Windows (git convertit LF en
+// CRLF au checkout) et le cliquet se declenche sur un artefact de stockage, pas sur du code
+// ajoute. Un garde-fou qui crie pour une raison fausse finit par etre desactive.
+const tailleZone = zoneDebut === -1 ? -1
+  : Buffer.byteLength(html.slice(zoneDebut, zoneFin).replace(/\r\n/g, "\n"), "utf8");
 ok(tailleZone > 0 && tailleZone <= BUDGET_ZONE_NON_TESTEE,
   "zone DOM non executee par Node sous son plafond (" + tailleZone + " / " + BUDGET_ZONE_NON_TESTEE + " octets)");
 // Et le calcul du CSV n'y est PLUS : preuve que l'extraction de ce cycle n'a pas ete defaite.
