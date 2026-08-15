@@ -14,7 +14,11 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
-const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+// 2026-08-15 : la cible n'est plus index.html (devenu la PAGE DE VENTE le 2026-08-14, ce qui
+// faisait planter cet oracle sur un bloc ENGINE_START absent). Le moteur vit dans demo.html,
+// l'artefact reellement publie. Surchargeable : node docs/verifier-fayna.js <fichier>.
+const CIBLE = process.argv[2] || "demo.html";
+const html = fs.readFileSync(path.join(ROOT, CIBLE), "utf8");
 
 const NBSP = " ";
 const FINE = " ";
@@ -175,7 +179,16 @@ if (E) {
   ok(mepTxt.indexOf("six cent quarante mille francs CFA") !== -1, "mise en demeure : montant en toutes lettres present");
   ok(mepTxt.indexOf("22" + NBSP + "mai" + NBSP + "2026") !== -1, "mise en demeure : date d'echeance FR");
   ok(mep.delai === 8 && /d[eé]lai de 8 jours/.test(mepTxt), "mise en demeure : delai formel de 8 jours");
-  ok(/OHADA/.test(mepTxt) && /injonction de payer/i.test(mepTxt), "mise en demeure : cadre OHADA + injonction de payer");
+  // 2026-08-15 : l'assertion « le courrier cite le cadre OHADA » est REMPLACEE, pas relachee.
+  // Elle exigeait exactement ce que la doctrine interdit desormais : un modele de lettre qui
+  // s'auto-certifie conforme a un texte de loi. Ce qui la remplace est PLUS contraignant
+  // (1 controle -> 3), et porte sur l'invariant qui compte : la lettre dit ce qui peut suivre,
+  // sans pretendre au visa d'un texte que personne n'a verifie.
+  ok(/injonction de payer/i.test(mepTxt), "mise en demeure : nomme la suite possible (injonction de payer)");
+  ok(!/acte uniforme/i.test(mepTxt) && !/conform/i.test(mepTxt),
+    "mise en demeure : AUCUNE auto-certification legale dans le courrier (radical « conform », « acte uniforme »)");
+  ok(/recommand[eé]e? avec accus[eé] de r[eé]ception/i.test(mepTxt) && /huissier/i.test(mepTxt),
+    "mise en demeure : la note renvoie au recommande AR et a l'huissier pour la valeur probante");
   ok(/amiable/i.test(mepTxt), "mise en demeure : ouverture a une issue amiable");
   ok(/ne garantit aucun r[eé]sultat/i.test(mep.note), "mise en demeure : note honnete (aucun resultat garanti)");
   ok(/huissier/i.test(mep.note) && /recommand[eé]e/i.test(mep.note), "mise en demeure : recommande RAR/huissier pour la valeur probante");
@@ -616,6 +629,122 @@ ok(!/Fonctionne hors-ligne, aucune donn[eé]e ne quitte/.test(html),
    "honnetete : plus aucune promesse hors-ligne ABSOLUE non conditionnee (formulation ancienne bannie)");
 ok(/envoyés au fournisseur choisi/.test(html),
    "honnetete : la divulgation IA precise ce qui part (nom, montant, message) et vers qui");
+
+/* ---------- 12. Couche DEMO PUBLIQUE (bloc DEMO_START, evalue en Node) ----------
+   Ajoutee le 2026-08-15 avec le portage du moteur verifie vers la demo publiee. Le plafond,
+   l'amorcage et les dossiers fictifs sont du CODE, donc ils se prouvent comme du code : la
+   version precedente de la demo promettait des fonctions absentes precisement parce que rien
+   n'executait sa couche d'accueil. */
+const dStart = html.indexOf("/*DEMO_START*/");
+const dEnd = html.indexOf("/*DEMO_END*/");
+ok(dStart !== -1 && dEnd !== -1 && dEnd > dStart, "bornes /*DEMO_START*/ et /*DEMO_END*/ presentes");
+let D = null;
+try {
+  D = (0, eval)(html.slice(dStart, dEnd) + "\n;FAYNA_DEMO");
+} catch (e) {
+  ok(false, "eval de la couche demo sans erreur (" + e.message + ")");
+}
+ok(D && typeof D.decisionAmorcage === "function", "couche demo exporte decisionAmorcage");
+
+if (D) {
+  /* Plafond : la frontiere annoncee au visiteur doit etre CELLE QUI S'APPLIQUE. */
+  ok(D.PLAFOND === 5, "plafond de la demo = 5 dossiers (trouve " + D.PLAFOND + ")");
+  ok(html.indexOf("5 dossiers au maximum") !== -1, "le bandeau annonce le plafond au visiteur");
+  ok(html.indexOf("plafonnée à " + D.PLAFOND + " dossiers") !== -1,
+    "le formulaire annonce le MEME plafond que le code (" + D.PLAFOND + ")");
+
+  /* Le plafond mord, et il mord au bon endroit : 4 passe, 5 bloque. (LECON 16 : tester la
+     CONSEQUENCE, pas la presence de la constante.) */
+  ok(D.peutAjouter(0) === true, "plafond : un 1er dossier est acceptable");
+  ok(D.peutAjouter(4) === true, "plafond : le 5e dossier est acceptable (4 en base)");
+  ok(D.peutAjouter(5) === false, "plafond : le 6e dossier est refuse (5 en base)");
+  ok(D.peutAjouter(9) === false, "plafond : refus au-dela aussi");
+  ok(D.placesLibres(0) === 5 && D.placesLibres(3) === 2, "places libres calculees juste");
+  ok(D.placesLibres(7) === 0, "places libres jamais negatives (LECON 17 : un debordement ne passe pas mieux qu'un vide)");
+
+  /* Amorcage : le piege reel est « Tout effacer » annule par un re-amorcage au rechargement. */
+  var a1 = D.decisionAmorcage(false, 0);
+  ok(a1.poserMarqueur === true && a1.semer === true, "1re visite, liste vide : on marque ET on seme");
+  var a2 = D.decisionAmorcage(false, 2);
+  ok(a2.poserMarqueur === true && a2.semer === false, "1re visite avec des donnees deja la : on marque, on ne SEME PAS");
+  var a3 = D.decisionAmorcage(true, 0);
+  ok(a3.poserMarqueur === false && a3.semer === false,
+    "apres « Tout effacer » puis rechargement : la liste RESTE vide (aucun re-amorcage)");
+  var a4 = D.decisionAmorcage(true, 3);
+  ok(a4.poserMarqueur === false && a4.semer === false, "visite suivante avec donnees : rien n'est touche");
+
+  /* Donnees fictives : trois dossiers, trois niveaux d'escalade differents, dates relatives. */
+  var fict = D.dossiersFictifs("2026-08-15");
+  ok(Array.isArray(fict) && fict.length === 3, "3 dossiers fictifs pre-charges (trouve " + (fict || []).length + ")");
+  ok(fict.length <= D.PLAFOND, "l'amorcage ne depasse jamais le plafond qu'il annonce");
+  var niveaux = fict.map(function (d) { return E.niveau(E.joursRetard(d.echeance, "2026-08-15")); });
+  ok(new Set(niveaux).size === 3, "les 3 dossiers fictifs illustrent 3 niveaux d'escalade distincts (" + niveaux.join(",") + ")");
+  var fictPlusTard = D.dossiersFictifs("2027-01-20");
+  ok(fictPlusTard[0].echeance !== fict[0].echeance,
+    "les echeances fictives suivent le jour de la visite (la demo ne vieillit pas toute seule)");
+  ok(fict.every(function (d) { return E.joursRetard(d.echeance, "2026-08-15") > 0; }),
+    "chaque dossier fictif est reellement en retard le jour de la visite");
+  /* Aucun numero fictif ne doit ressembler au numero reel de la maison : un visiteur qui clique
+     « Envoyer sur WhatsApp » depuis la demo ne doit joindre personne. */
+  ok(fict.every(function (d) { return String(d.tel).replace(/\D/g, "").indexOf("784266546") === -1; }),
+    "aucun dossier fictif ne porte le numero reel de Jaayleer");
+}
+
+/* ---------- 13. Export CSV : le CONTENU, pas le libelle des colonnes ----------
+   Trouve par la revue QA adverse du 2026-08-15 : le controle precedent verifiait la presence
+   litterale des entetes « nb_relances » et « derniere_relance » dans le HTML. En vidant la
+   boucle qui remplit les lignes, l'export ne sortait plus que l'entete et l'oracle restait vert.
+   On teste desormais le tableau REELLEMENT produit. */
+if (E && typeof E.lignesCSV === "function") {
+  const jeu = [
+    { nom: "Boutique Ndiaye", tel: "771234567", montant: 150000, echeance: "2026-07-24", paye: false, relances: [] },
+    { nom: 'Ets "Fall"; & Frères', tel: "", montant: 640000, echeance: "2026-06-29", paye: true, relances: [{ date: "2026-07-26", niveau: 2 }] }
+  ];
+  const lignes = E.lignesCSV(jeu, "2026-08-15");
+  ok(lignes.length === 3, "CSV : une ligne d'entete + une ligne PAR dossier (trouve " + lignes.length + ")");
+  ok(lignes[0].length === 9 && lignes[0][0] === "nom", "CSV : 9 colonnes, entete en tete");
+  ok(lignes.every((l) => l.length === lignes[0].length), "CSV : toutes les lignes ont le meme nombre de colonnes");
+  ok(lignes[1][0] === "Boutique Ndiaye" && String(lignes[1][2]) === "150000", "CSV : le nom et le montant du dossier sortent vraiment");
+  ok(Number(lignes[1][4]) === E.joursRetard("2026-07-24", "2026-08-15"), "CSV : les jours de retard sont CALCULES, pas vides");
+  ok(lignes[1][5] === E.NIVEAUX[E.niveau(E.joursRetard("2026-07-24", "2026-08-15"))].labelFr, "CSV : le niveau d'escalade est celui du moteur");
+  ok(lignes[2][6] === "oui" && lignes[1][6] === "non", "CSV : l'etat paye/non paye est rendu");
+  ok(Number(lignes[2][7]) === 1, "CSV : le nombre de relances est compte");
+  ok(E.lignesCSV([], "2026-08-15").length === 1, "CSV : liste vide = entete seule, jamais une erreur");
+  ok(E.lignesCSV(null, "2026-08-15").length === 1, "CSV : entree absente traitee comme vide (LECON 17)");
+
+  const texte = E.serialiserCSV(lignes);
+  const lignesTexte = texte.split("\r\n");
+  ok(lignesTexte.length === 3, "CSV serialise : 3 lignes separees par CRLF");
+  ok(lignesTexte[0] === "nom;whatsapp;montant_fcfa;echeance;jours_retard;niveau;paye;nb_relances;derniere_relance",
+    "CSV serialise : entete exacte, separateur point-virgule");
+  ok(lignesTexte[1].indexOf("Boutique Ndiaye") !== -1, "CSV serialise : la donnee du dossier est bien dans le texte");
+  ok(lignesTexte[2].indexOf('"Ets ""Fall""; & Frères"') !== -1,
+    "CSV serialise : guillemets doubles et point-virgule echappes (une raison sociale ne casse pas le fichier)");
+  ok(E.serialiserCSV([["a"]]) === "a", "CSV serialise : cas minimal sans echappement inutile");
+}
+
+/* ---------- 14. Cliquet sur la zone que Node n'execute JAMAIS ----------
+   La revue QA adverse du 2026-08-15 a mis le doigt sur un defaut structurel, pas ponctuel : tout
+   ce qui vit apres /*DEMO_END*​/ est garde par `if (typeof document === "undefined") return;`,
+   donc aucun harnais ne l'execute. Ce cycle en a sorti l'export CSV. Le reste (cablage DOM,
+   rendu, ecouteurs) y demeure et reste NON PROUVE — c'est ecrit tel quel dans DECISIONS.md.
+   Faute de pouvoir tout extraire aujourd'hui, on pose un cliquet : cette zone ne doit plus
+   GROSSIR. Toute logique metier ajoutee la fera echouer l'oracle, ce qui force a l'extraire
+   vers un bloc testable au lieu de l'enfouir dans un gestionnaire de clic. */
+const BUDGET_ZONE_NON_TESTEE = 27500; // octets. Mesure du 2026-08-15 : 27 299. Ne JAMAIS relever
+                                      // ce plafond pour faire passer un ajout : extraire le code.
+const zoneDebut = html.indexOf("/*DEMO_END*/");
+const zoneFin = html.lastIndexOf("</script>");
+ok(zoneDebut !== -1 && zoneFin > zoneDebut, "bornes de la zone DOM identifiables");
+const tailleZone = zoneDebut === -1 ? -1 : Buffer.byteLength(html.slice(zoneDebut, zoneFin), "utf8");
+ok(tailleZone > 0 && tailleZone <= BUDGET_ZONE_NON_TESTEE,
+  "zone DOM non executee par Node sous son plafond (" + tailleZone + " / " + BUDGET_ZONE_NON_TESTEE + " octets)");
+// Et le calcul du CSV n'y est PLUS : preuve que l'extraction de ce cycle n'a pas ete defaite.
+const zoneDom = zoneDebut === -1 ? "" : html.slice(zoneDebut, zoneFin);
+ok(zoneDom.indexOf("nb_relances") === -1,
+  "le calcul de l'export CSV a quitte la zone non testee (il est dans le moteur)");
+ok(/E\.serialiserCSV\(E\.lignesCSV\(/.test(zoneDom),
+  "le gestionnaire de clic delegue l'export au moteur teste");
 
 /* ---------- Rapport ---------- */
 console.log("");

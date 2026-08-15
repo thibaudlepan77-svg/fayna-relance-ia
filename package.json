@@ -7,7 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node docs/verifier-fayna.js && node docs/rouge-moteur.js && node verifier.js && node verifier.js --rouge",
+    "test:live": "node verifier.js --live"
   },
   "repository": {
     "type": "git",
@@ -15,7 +16,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/thibaudlepan77-svg/fayna-relance-ia/issues"

@@ -117,20 +117,109 @@ function controler(vente, demo, objections, parcours) {
   /* ---------- 5. La demo doit s'ouvrir SANS COMPTE (exigence du rang 1) ---------- */
   if (demo !== null) {
     const n = sansAccent(demo);
-    ok(!/type=["']password["']/.test(n), "la demo ne contient aucun champ mot de passe");
+    // Un seul champ masque est legitime : la cle IA du visiteur (elle ne doit PAS s'afficher en
+    // clair sur un ecran partage). Tout autre champ masque signale une authentification, donc un
+    // compte, donc la violation du critere « ouvrable en un clic, sans compte ».
+    const champsMasques = [...demo.matchAll(/<input[^>]*type=["']password["'][^>]*>/gi)].map((m) => m[0]);
+    ok(champsMasques.length <= 1,
+      "au plus un champ masque dans la demo (trouve " + champsMasques.length + ")");
+    ok(champsMasques.every((c) => /id=["']ai-key["']/.test(c)),
+      "le seul champ masque de la demo est la cle IA du visiteur, pas un mot de passe de compte");
     for (const mot of ["se connecter", "inscription", "creer un compte", "connexion requise"]) {
       ok(!n.includes(mot), "la demo n'exige pas de compte (absence de « " + mot + " »)");
     }
     ok(n.includes("localstorage"), "la demo persiste en local (localStorage), aucun serveur");
-    // Le lien WhatsApp de la demo est construit depuis la fiche du debiteur fictif, pas code en dur.
-    ok(/wa\.me\/\$\{/.test(demo), "la demo construit wa.me depuis la donnee, pas un numero en dur");
+    // Le lien WhatsApp du DEBITEUR se construit depuis sa fiche, jamais en dur : un numero fige
+    // enverrait tous les visiteurs de la demo relancer la meme personne reelle. Seul le contact
+    // de l'editeur a le droit d'etre ecrit en dur, et c'est verifie au point 5 bis.
+    ok(/"https:\/\/wa\.me\/" \+ /.test(demo),
+      "le lien WhatsApp du debiteur est construit depuis sa fiche, pas code en dur");
+    const waEnDur = [...new Set([...demo.matchAll(/wa\.me\/(\d+)/g)].map((m) => m[1]))];
+    ok(waEnDur.every((n) => n === TEL_CANONIQUE),
+      "aucun numero de debiteur code en dur derriere wa.me (trouves : " + waEnDur.join(", ") + ")");
   }
 
-  /* ---------- 6. Aucune fonction promise a la demo qu'elle n'a pas ---------- */
-  // c74 : « 20/22 fausses promesses passaient invisibles ». Les documents de vente ont
-  // continue a promettre echeancier / export CSV / mise en demeure APRES que la
-  // reimplementation de demo.html les a perdus. Ce controle rend la divergence
-  // impossible a reintroduire en silence.
+  /* ---------- 5 bis. La demo est publiee sur GitHub Pages : rien de TRANSACTIONNEL ----------
+     Le ToS interdit un site « primarily directed at facilitating commercial transactions or
+     providing commercial SaaS ». Il n'interdit pas a un outil libre de nommer son auteur : tout
+     projet open source le fait. La regle posee ce matin bannissait TOUT contact, ce qui faisait
+     de la seule page en ligne un cul-de-sac, 100 % des prospects convaincus perdus. Elle est
+     donc recadree sur ce que le texte vise reellement, la transaction, et durcie sur ce qui
+     compte pour la maison : si un contact est affiche, il doit etre le CANONIQUE. */
+  if (demo !== null) {
+    ok(!demo.includes("FCFA/mois"), "aucun tarif d'abonnement dans la demo (ToS GitHub Pages)");
+    ok(!/class="price"/.test(demo), "aucune grille de prix dans la demo");
+    const nD = sansAccent(demo);
+    for (const mot of ["s'abonner", "acheter", "commander", "paiement en ligne", "ajouter au panier"]) {
+      ok(!nD.includes(mot), "aucune mecanique d'achat dans la demo (absence de « " + mot + " »)");
+    }
+    // Un contact est autorise, et s'il existe il ne peut etre que le bon. Un numero invente sur
+    // la seule page publique de la maison est la faute la plus chere du lot (deja payee le matin).
+    const numeros = [...new Set([...demo.matchAll(/wa\.me\/(\d+)/g)].map((m) => m[1]))];
+    const intrus = numeros.filter((n) => n !== TEL_CANONIQUE);
+    ok(intrus.length === 0, "tout lien WhatsApp fixe de la demo pointe le numero canonique (intrus : " + intrus.join(", ") + ")");
+    const mails = [...new Set([...demo.matchAll(/[a-zA-Z0-9._-]+@jaayleer\.com/g)].map((m) => m[0]))];
+    ok(mails.every((m) => m === MAIL_CANONIQUE), "tout email affiche dans la demo est le canonique (trouves : " + mails.join(", ") + ")");
+    // Et le chemin de retour existe : sans lui, la demo convainc pour personne.
+    ok(mails.length > 0 || numeros.length > 0, "la demo offre un chemin de retour vers l'editeur");
+  }
+
+  /* ---------- 5 ter. La demo ne s'auto-certifie pas plus que la page de vente ---------- */
+  // Meme regle que le point 4, appliquee a l'artefact qui GENERE un courrier destine a un tiers.
+  // C'est le support le plus expose : la page de vente affirme, la demo met des mots dans la
+  // bouche du client. Le radical « conform » y est donc banni aussi. (LECON 15)
+  if (demo !== null) {
+    const n = sansAccent(demo);
+    ok(!n.includes("aucun risque juridique"), "demo : pas d'allegation « aucun risque juridique »");
+    ok(!/conform[ea]ment a l'?acte uniforme/.test(n), "demo : le courrier ne se dit pas conforme a l'Acte uniforme");
+    ok(!/article\s+\d+\s+de\s+l'?acte\s+uniforme/.test(n), "demo : aucune citation d'article OHADA");
+    ok(!n.includes("mise en demeure ohada"), "demo : la mise en demeure n'est pas presentee comme certifiee OHADA");
+    // Contrepartie POSITIVE : retirer le vernis juridique sans mettre l'avertissement a la place
+    // laisserait le visiteur croire qu'il tient un acte. On exige donc la mise en garde.
+    ok(n.includes("professionnel du droit"), "demo : le modele de lettre renvoie a un professionnel du droit");
+    // Trouve par la revue juridique adverse du 2026-08-15 : l'outil fait saisir les donnees
+    // personnelles d'un TIERS (le debiteur, qui n'a rien demande) et n'en disait pas un mot,
+    // alors que la page de vente, elle, le disait. Le devoir d'information suit l'outil, pas
+    // la brochure. Deux emplacements exiges : au moment d'activer l'IA, et dans les mentions.
+    ok((n.match(/2008-12/g) || []).length >= 2,
+      "demo : la loi senegalaise 2008-12 est rappelee au moins deux fois (option IA + mentions)");
+    ok(n.includes("responsable de traitement"), "demo : l'utilisateur est nomme responsable de traitement");
+  }
+
+  /* ---------- 5 quater. Cadre de la demonstration VISIBLE PAR LE VISITEUR ---------- */
+  // Le controle est borne au bandeau : un commentaire de code contenant « fictifs » satisfaisait
+  // la version precedente de cette regle sans que le visiteur en voie la moindre trace.
+  if (demo !== null) {
+    const i = demo.indexOf('id="bandeau-demo"');
+    ok(i !== -1, "bandeau de demonstration present dans la page");
+    const bandeau = i === -1 ? "" : sansAccent(demo.slice(i, demo.indexOf("</div>", demo.indexOf("</div>", i) + 1)));
+    ok(bandeau.includes("demonstration publique"), "le bandeau annonce une demonstration publique");
+    ok(bandeau.includes("fictifs"), "le bandeau annonce des dossiers fictifs");
+    ok(bandeau.includes("ne joignent personne"), "le bandeau previent que les numeros ne joignent personne");
+  }
+
+  /* ---------- 6. La demo publiee porte bien les fonctions que les documents annoncent ----------
+     Le 2026-08-15, l'ecart a ete resorbe DANS LE BON SENS : au lieu de rabaisser les documents
+     au niveau d'une reimplementation appauvrie, on a publie le moteur verifie. Ce controle
+     verrouille le nouvel etat, sinon une regression ramenerait l'artefact faible en silence. */
+  if (demo !== null) {
+    const nDemo = sansAccent(demo);
+    // On verifie la COMMANDE offerte au visiteur, pas la simple presence du mot : « csv »
+    // se trouve aussi dans un nom de fichier et un type MIME, qui survivraient au retrait
+    // complet de la fonction. (LECON 16 : tester la consequence, pas la trace.)
+    ok(nDemo.includes("exporter en csv") && demo.includes('id="btn-export"'),
+      "la demo offre l'export CSV (bouton + libelle)");
+    ok(nDemo.includes("echeancier de paiement") || nDemo.includes("proposer un echeancier"),
+      "la demo offre l'echeancier negocie");
+    ok(nDemo.includes("mise en demeure") && demo.includes('id="mep-print"'),
+      "la demo offre le modele de mise en demeure imprimable");
+    ok(nDemo.includes("toutes lettres"), "la mise en demeure ecrit le montant en toutes lettres");
+    ok(nDemo.includes("wolof"), "la demo est bien bilingue (wolof present)");
+  }
+
+  /* ---------- 6 bis. Aucune fonction promise a la demo qu'elle n'a pas ---------- */
+  // c74 : « 20/22 fausses promesses passaient invisibles ». Le controle reste en place meme
+  // maintenant que la demo est complete : c'est lui qui empechera la prochaine divergence.
   if (demo !== null && parcours !== null) {
     const nDemo = sansAccent(demo);
     // Zone = uniquement ce que l'etape 2 affirme de LA DEMO, borne a l'encadre d'ecart.
@@ -148,6 +237,56 @@ function controler(vente, demo, objections, parcours) {
         "le parcours ne promet pas « " + fonction + " » a une demo qui ne l'a pas");
     }
   }
+
+  controlerDonneesFictives(demo, parcours);
+}
+
+/* ---------- 6 ter. Le parcours decrit les VRAIES donnees fictives ----------
+   Le controle le plus utile du lot : le 2026-08-15, PARCOURS-ENTREE.md annoncait « Clinique
+   Teranga, 90 000 FCFA, J-3 » et un total de 880 000 FCFA, alors que la demo servait un autre
+   debiteur, un autre montant et un autre total. Personne ne l'aurait vu avant un prospect.
+   On ne compare donc plus des textes entre eux : on compare le texte au CODE EXECUTE. */
+function controlerDonneesFictives(demo, parcours) {
+  if (demo === null || parcours === null) return;
+  const d0 = demo.indexOf("/*DEMO_START*/");
+  const d1 = demo.indexOf("/*DEMO_END*/");
+  ok(d0 !== -1 && d1 > d0, "bloc DEMO_START present dans demo.html");
+  if (d0 === -1 || d1 <= d0) return;
+
+  let D = null;
+  try { D = (0, eval)(demo.slice(d0, d1) + "\n;FAYNA_DEMO"); }
+  catch (e) { ok(false, "couche demo evaluable (" + e.message + ")"); return; }
+  ok(D && typeof D.dossiersFictifs === "function", "couche demo expose dossiersFictifs");
+  if (!D) return;
+
+  const dossiers = D.dossiersFictifs("2026-08-15");
+  const nPar = sansAccent(parcours);
+  const debut = nPar.indexOf("etape 2");
+  const fin = nPar.indexOf("ecart connu");
+  const zone = debut !== -1 && fin > debut ? parcours.slice(debut, fin) : parcours;
+
+  // Chaque debiteur servi par le code doit etre decrit, avec SON montant.
+  for (const d of dossiers) {
+    ok(zone.includes(d.nom), "le parcours nomme le debiteur fictif « " + d.nom + " »");
+    const montantEcrit = String(d.montant).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    ok(zone.replace(/[  ]/g, " ").includes(montantEcrit),
+      "le parcours porte le montant reel de « " + d.nom + " » (" + montantEcrit + ")");
+  }
+  // Et AUCUN debiteur decrit ne doit etre absent du code (le piege « Clinique Teranga »).
+  // Une ligne de debiteur = un nom EN GRAS suivi d'un montant en FCFA. Le critere porte sur la
+  // forme reelle de la fiche, pas sur la numerotation : la liste des actions est numerotee elle
+  // aussi, et la confondre avec des debiteurs ferait crier le harnais pour rien.
+  const decrits = [...zone.matchAll(/^\s*\d+\.\s+\*\*(.+?)\*\*\s+—\s+[\d   ]+\s*FCFA/gm)].map((m) => m[1]);
+  const fantomes = decrits.filter((nom) => !dossiers.some((d) => d.nom === nom));
+  ok(fantomes.length === 0, "aucun debiteur decrit qui n'existe pas dans le code (fantomes : " + fantomes.join(", ") + ")");
+  ok(decrits.length === dossiers.length,
+    "le parcours decrit exactement " + dossiers.length + " debiteurs (trouve " + decrits.length + ")");
+
+  // Le total annonce doit etre la somme reelle.
+  const total = dossiers.reduce((s, d) => s + d.montant, 0);
+  const totalEcrit = String(total).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  ok(zone.replace(/[  ]/g, " ").includes(totalEcrit),
+    "le KPI annonce par le parcours est la somme reelle (" + totalEcrit + " FCFA)");
 }
 
 /* ---------- 7. Verification en ligne (--live) ---------- */
@@ -183,11 +322,36 @@ function autoTestRouge() {
     ["une objection supprimee", (v) => v.replace("<h3>« C'est trop cher. »</h3>", "<h3>supprimee</h3>")],
     ["prix desaccorde entre page et parcours", (v) => v.replace(/class="price">5[   ]000/, 'class="price">9 000')],
   ];
-  // Mutations portant sur PARCOURS-ENTREE.md : elles reintroduisent la fausse promesse
-  // reellement constatee le 2026-08-15 (echeancier / CSV promis a une demo qui ne les a pas).
+  // Mutations portant sur PARCOURS-ENTREE.md.
   const mutationsParcours = [
-    ["echeancier re-promis a la demo", (p) => p.replace("4. **Copier le message**", "4. **Proposer un échéancier**")],
     ["bornes de la section demo effacees", (p) => p.replace(/Écart connu/g, "Remarque")],
+    // Le defaut REEL du 2026-08-15 : un debiteur decrit qui n'existe nulle part dans le code.
+    ["debiteur fantome ajoute au parcours",
+      (p) => p.replace("3. **Restaurant Teranga**", "3. **Clinique Teranga** — 90 000 FCFA — échéance J-3\n  4. **Restaurant Teranga**")],
+    ["total des KPI fausse", (p) => p.replace("875 000 FCFA", "880 000 FCFA")],
+  ];
+  // Mutations portant sur demo.html. Ajoutees le 2026-08-15 avec le portage du moteur verifie :
+  // le harnais surveillait la page de vente, la demo etait un angle mort. La premiere mutation
+  // rejoue la regression exacte a eviter, le retour a l'artefact appauvri.
+  const mutationsDemo = [
+    ["retour a une demo sans echeancier", (d) => d.replace(/[eé]ch[eé]ancier/gi, "option")],
+    ["retour a une demo sans export CSV", (d) => d.replace(/csv/gi, "tableau")],
+    ["numero code en dur derriere wa.me", (d) => d.replace('"https://wa.me/" + n', '"https://wa.me/221771234567"')],
+    ["tarif d'abonnement publie sur GitHub Pages", (d) => d.replace("</body>", "<p>15 000 FCFA/mois</p></body>")],
+    ["email non canonique dans la demo", (d) => d.replace(MAIL_CANONIQUE, "fayna@jaayleer.com")],
+    ["numero non canonique dans la demo", (d) => d.replace("wa.me/" + TEL_CANONIQUE, "wa.me/221770000000")],
+    ["chemin de retour vers l'editeur supprime",
+      (d) => d.replace(/<a href="mailto:[^"]*">[^<]*<\/a>/g, "nous").replace(/<a href="https:\/\/wa\.me\/\d+">[^<]*<\/a>/g, "WhatsApp")],
+    ["bouton d'achat ajoute a la demo", (d) => d.replace("</body>", "<button>S'abonner</button></body>")],
+    ["information sur les donnees personnelles retiree", (d) => d.replace(/2008-12/g, "en vigueur")],
+    ["responsabilite du traitement effacee", (d) => d.replace(/responsable de traitement/g, "utilisateur")],
+    ["champ de connexion ajoute a la demo", (d) => d.replace("</body>", '<input id="pwd" type="password"></body>')],
+    ["cadre de demonstration efface du bandeau", (d) => d.replace("Démonstration publique.", "Bienvenue.")],
+    ["dossiers fictifs presentes comme reels", (d) => d.replace(/fictifs/g, "réels")],
+    ["avertissement juriste retire du modele de lettre", (d) => d.replace(/professionnel du droit/g, "spécialiste")],
+    // Le code derive, les documents ne suivent pas : c'est la divergence par l'autre bout.
+    ["un debiteur fictif renomme dans le code", (d) => d.replace('nom: "Restaurant Teranga"', 'nom: "Clinique Teranga"')],
+    ["un montant fictif change dans le code", (d) => d.replace("montant: 85000", "montant: 90000")],
   ];
 
   const vente0 = lire("index.html");
@@ -195,19 +359,24 @@ function autoTestRouge() {
   const obj0 = lire("OBJECTIONS.md");
   const par0 = lire("PARCOURS-ENTREE.md");
   let attrapees = 0;
-  const total = mutations.length + mutationsParcours.length;
+  let inertes = 0;
+  const total = mutations.length + mutationsParcours.length + mutationsDemo.length;
 
-  function essayer(nom, v, d, o, p) {
+  function essayer(nom, v, d, o, p, avant, apres) {
+    // Une mutation qui ne modifie RIEN mesurerait le vide et compterait comme un succes.
+    // Elle est signalee et comptee en echec. (LECON 8 : echouer ferme, jamais en silence.)
+    if (avant === apres) { inertes++; console.log("  [INERTE] " + nom + " -> cible absente du fichier"); return; }
     pass = 0; echecs.length = 0;
     controler(v, d, o, p);
     if (echecs.length > 0) { attrapees++; console.log("  [rouge OK] " + nom + " -> " + echecs.length + " echec(s)"); }
     else console.log("  [TROU] " + nom + " NON DETECTEE");
   }
 
-  for (const [nom, muter] of mutations) essayer(nom, muter(vente0), demo0, obj0, par0);
-  for (const [nom, muter] of mutationsParcours) essayer(nom, vente0, demo0, obj0, muter(par0));
+  for (const [nom, muter] of mutations) { const m = muter(vente0); essayer(nom, m, demo0, obj0, par0, vente0, m); }
+  for (const [nom, muter] of mutationsParcours) { const m = muter(par0); essayer(nom, vente0, demo0, obj0, m, par0, m); }
+  for (const [nom, muter] of mutationsDemo) { const m = muter(demo0); essayer(nom, vente0, m, obj0, par0, demo0, m); }
 
-  console.log("\nMutations attrapees : " + attrapees + "/" + total);
+  console.log("\nMutations attrapees : " + attrapees + "/" + total + (inertes ? "  (dont " + inertes + " inertes)" : ""));
   process.exit(attrapees === total ? 0 : 1);
 }
 

@@ -38,32 +38,44 @@ Elle est prête dans `index.html` et attend un hébergeur gratuit à usage comme
 **URL publique réelle, en ligne et vérifiée le 2026-08-15 (HTTP 200) :**
 `https://thibaudlepan77-svg.github.io/fayna-relance-ia/`
 
-**À l'ouverture (chargement unique) :**
-- `localStorage` pré-rempli avec **3 débiteurs fictifs** :
-  1. **Boutique Ndiaye** — 150 000 FCFA — échéance J-22 — niveau « Relance ferme » — relation habituel
-  2. **Ets Fall & Frères** — 640 000 FCFA — échéance J-47 — niveau « Mise en demeure amiable » — relation sensible
-  3. **Clinique Teranga** — 90 000 FCFA — échéance J-3 — niveau « Premier rappel » — relation nouveau
-- Réglages par défaut : signature « Entreprise Diallo & Fils », canal « Wave ou Orange Money », lieu « Dakar ».
+**Ce qui est en ligne depuis le 2026-08-15 : le moteur complet vérifié** (374 assertions vertes,
+9 mutations injectées et 9 attrapées), et non plus la version réduite publiée la veille.
+
+**À l'ouverture (premier chargement, aucun clic) :**
+- `localStorage` pré-rempli avec **3 débiteurs fictifs**, échéances relatives au jour de la visite
+  pour que la démo ne vieillisse pas toute seule (valeurs mesurées le 2026-08-15) :
+  1. **Boutique Ndiaye** — 150 000 FCFA — échéance J-22 — niveau « Relance ferme » — habituel — FR + wolof
+  2. **Ets Fall & Frères** — 640 000 FCFA — échéance J-47 — niveau « Mise en demeure amiable » — nouveau — FR
+  3. **Restaurant Teranga** — 85 000 FCFA — échéance J-4 — niveau « Premier rappel » — délicat — FR + wolof
+- Les trois numéros sont **fictifs** et ne joignent personne. Le bandeau le dit au visiteur.
+- Réglages par défaut : signature **vide** (« Entreprise Diallo & Fils » n'est qu'un exemple grisé
+  dans le champ), canal « Wave ou Orange Money », lieu « Dakar ».
 
 **Actions réellement possibles dans la démo publiée, vérifiées le 2026-08-15 :**
-1. **Voir le tableau de bord** : KPI (total 880 000 FCFA, 3 relances, plus ancien 47 jours), liste triée par priorité.
+1. **Voir le tableau de bord** : KPI (total **875 000 FCFA**, 3 relances, plus ancien **47 jours**), liste triée par priorité.
 2. **Changer d'onglet langue** : FR / Wolof / FR+Wolof sur chaque fiche.
 3. **Cliquer « Envoyer par WhatsApp »** : ouvre `wa.me/<numéro de la fiche>?text=...` avec message pré-rempli.
 4. **Copier le message** : bouton « Copier », pour un envoi par SMS ou e-mail.
 5. **Modifier un débiteur** (bouton « Modifier ») → change montant/date → re-génère message.
 6. **Ajouter un client** : formulaire complet → génère relance immédiate.
-7. **Supprimer un débiteur**.
-8. **Réinitialiser la démo** : remet les 3 fiches fictives, repart propre.
+7. **Supprimer un débiteur**, ou **« Tout effacer »** pour repartir d'une liste vide.
+8. **« Charger un exemple »** : recharge les fiches fictives.
+9. **Proposer un échéancier négocié** : nombre de versements et fréquence au choix, répartition au
+   franc près (la somme des versements égale exactement la dette), message de proposition prêt.
+10. **« Exporter en CSV »** : le fichier des impayés, téléchargé depuis le navigateur.
+11. **Générer le modèle de mise en demeure imprimable** : montant en toutes lettres, délai de 8 jours.
+12. **Brancher sa propre clé IA gratuite** (Groq ou Gemini), avec garde-fou mécanique : toute
+    réécriture qui change un montant, une date, ou ajoute une menace est refusée.
 
-> **Écart connu, à ne pas re-promettre.** La démo publiée est une version réduite.
-> **L'échéancier négocié, l'export CSV et la génération du document de mise en demeure
-> n'y sont PAS** (mesuré : 0 occurrence dans `demo.html`). Ces trois fonctions existent
-> et sont vérifiées dans le moteur complet archivé (`archive\snapshot-65-79-fayna`,
-> 351 assertions vertes rejouées le 2026-08-15), qui n'est pas encore ce qui est en ligne.
-> Tant que le moteur complet n'est pas publié, **aucun support commercial ne doit dire
-> que la démo fait ces trois choses**. Le harnais `verifier.js` bloque toute réintroduction.
+> **Écart connu, à ne pas maquiller.** La démo publiée est le produit complet, à **une** différence
+> près : elle **plafonne à 5 dossiers** (annoncé dans le bandeau et sous le formulaire). Ce plafond
+> **signale** la frontière du produit, il ne la protège pas : le fichier est un HTML autoportant
+> sous licence MIT, n'importe qui peut lire la source et retirer la limite. C'est assumé, et la
+> conséquence commerciale est posée à Thibaud dans `DECISIONS.md` (A3 bis). Aucun support
+> commercial ne doit présenter ce plafond comme une protection technique.
 
-**Aucune inscription, aucun email, aucune clé IA requise.** L'outil est 100 % fonctionnel hors-ligne.
+**Aucune inscription, aucun email, aucune clé IA requise.** L'outil est fonctionnel hors-ligne
+tant que l'option IA reste désactivée, ce qui est le cas par défaut.
 
 ---
 
@@ -81,7 +93,7 @@ Elle est prête dans `index.html` et attend un hébergeur gratuit à usage comme
 | **IA personnalisation** | — | ✅ (clé gratuite client, sans surcoût) |
 | **Priorisation risque** | — | ✅ |
 | **Export CSV** | — | ✅ |
-| **Mise en demeure OHADA** | ✅ | ✅ |
+| **Modèle de mise en demeure** | ✅ | ✅ |
 | **Échéancier négocié** | ✅ | ✅ |
 
 **Règle :** Prix en FCFA, par mois, récurrent. Aucun frais caché. Arrêt quand on veut.
