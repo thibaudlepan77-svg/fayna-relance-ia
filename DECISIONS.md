@@ -5,6 +5,73 @@
 
 ---
 
+## 2026-08-15 14:26 (cycle 4) — Auto-cadrage : l'adresse publique de la démo
+
+### Faits vérifiés dans l'environnement, jamais supposés
+
+| Ce qui était écrit | Ce que j'ai mesuré | Verdict |
+|---|---|---|
+| A2, « créer un compte hébergeur engage l'identité de Thibaud », donc critère n° 1 bloqué | Le dépôt est **déjà public**, GitHub Pages est **déjà actif**, la démo est **déjà en ligne** | **A2 est périmé.** Aucun compte à créer. Le critère n° 1 n'est pas bloqué par l'hébergement, il est bloqué par **A1 seul** (la page affiche 5 000 / 15 000, prix non arbitré, publier un prix engage l'argent) |
+| Cycle précédent, « la démo FAYNA répond bien 200, vérifié en direct » | Vrai, mais sur la **racine**. `…/demo.html` répondait **404** | Le contrôle portait sur la bonne URL **par accident** : la branche `gh-pages` ne contient pas `demo.html`, elle sert la démo à la racine sous le nom `index.html` |
+| La page de vente et la démo sont « le même site » | `main` porte la page de vente, `gh-pages` porte la démo. **Deux branches, deux artefacts, un seul chemin racine** | Collision programmée, voir D1 |
+| La démo en ligne est bien celle qui est prouvée | Corps servi = **96 405 octets normalisés**, identique octet pour octet à `demo.html` de `main` | **Vrai, re-prouvé ce cycle**, pas hérité |
+| `changedetection.io`, Apache-2.0 (fiche du rang 3) | API GitHub en direct, **Apache-2.0**, 33 147 étoiles, poussé le 2026-08-07, non archivé. **Absent des 150 briques de la bibliothèque** (grep sur tous les `.md`, zéro occurrence) | Fiche exacte, mais la brique est **hors bibliothèque vérifiée** : à traiter comme un ajout, pas comme un acquis |
+
+### Le défaut réel, et pourquoi il valait ce cycle
+
+`main/index.html` (page de vente) pointe vers `href="demo.html"` en **relatif**, et
+`offre-packagee.html` du rang 2 pointait vers la **racine**. Or la racine est occupée par la démo.
+Le jour où la page de vente est publiée — c'est-à-dire le jour où A1 est tranché, donc le jour de
+la plus forte valeur — elle prend la racine, et **les deux liens changent silencieusement de
+destination** : « Ouvrir la démonstration » aurait servi la page de vente, et le seul actif
+démontrable de la maison serait devenu inatteignable au moment précis où on le montre.
+Aucun test ne l'aurait vu, parce que les deux URL répondent 200. **C'est la leçon 20 rejouée sous
+une autre forme** : un lien vivant qui pointe vers la mauvaise chose est pire qu'un lien mort.
+
+### Décisions tranchées, une ligne et sa raison
+
+- **D1. La démo prend une adresse propre, `…/fayna-relance-ia/demo.html`.** C'est exactement
+  l'adresse que la page de vente attend déjà en relatif. Publier la page de vente devient le
+  remplacement d'**un seul fichier**, sans coordination et sans rien casser. **Validé.**
+- **D2. La racine devient une page de renvoi, pas une copie.** Dupliquer 96 Ko à deux chemins
+  crée deux vérités à synchroniser — exactement la faute de recopie de la leçon 32. Un seul
+  fichier porte la démo, la racine y renvoie. **Validé.**
+- **D3. Le renvoi porte un lien cliquable visible, en plus du renvoi automatique.** Un
+  `meta refresh` peut être ignoré (navigateur durci, lecteur d'écran) : sans lien de secours,
+  la page serait un cul-de-sac muet. **Validé.**
+- **D4. La page de renvoi ne porte ni tarif ni argumentaire**, et le harnais le vérifie. Elle
+  est un tremplin ; y glisser du commerce anticiperait A1 et heurterait les CGU de GitHub Pages.
+  **Validé.**
+- **D5. Le harnais gagne `verifierRacine()`, 4 contrôles.** L'ancienne adresse est déjà partie
+  dans le README, la page offre du rang 2 et les messages : on ne peut pas *espérer* qu'elle
+  renvoie encore, il faut le **mesurer à chaque passage**. **Validé.**
+- **D6. `URL_PUBLIQUE` du harnais pointe vers `demo.html`.** Le harnais a d'abord viré au
+  **rouge sur 10 contrôles** face à la page de renvoi de 1 454 octets — preuve rejouée, et non
+  supposée, que ces contrôles distinguent réellement les artefacts. **Validé.**
+
+### Preuves de ce cycle, toutes rejouées, aucune héritée
+
+- **584 assertions vertes, 0 rouge. 52 mutations sur 52 attrapées.**
+  Oracle du moteur 393 verts + 13/13 · `verifier.js --live` **84 verts** (80 anciens + 4 neufs)
+  + 24/24 · harnais DOM 107 verts + 15/15.
+- **En ligne, mesuré après publication** : `…/demo.html` répond 200 et son corps est **identique
+  octet pour octet** (96 405 normalisés) à la démo prouvée localement ; la racine répond 200,
+  renvoie vers `demo.html` et porte le lien de secours.
+- **Les 4 contrôles neufs sont prouvés discriminants, 3 sur 3** : confrontés au corps de la démo
+  (qui n'est pas une page de renvoi), ils passent tous au faux. Un contrôle qui ne sait pas dire
+  non ne prouve rien (leçon 18).
+- Non-régression de la page offre du rang 2 après changement d'URL : `verifier-offre.js --live`
+  **162 verts**, l'adresse stable est vérifiée en direct.
+
+### Garé en aValider — inchangé, et c'est le seul verrou qui reste
+
+- **A1 + A3 bis**, prix et modèle économique, couplés, **appartiennent à Thibaud**. Ils bloquent
+  à eux seuls les critères n° 1 et n° 2 du rang 1. Rien d'autre ne bloque.
+- **A2 est CLOS** : périmé, l'hébergement gratuit est acquis et en service. Ne plus le compter
+  comme un blocage.
+
+---
+
 ## 2026-08-15 (cycle 3) — Auto-cadrage : lever la dette de preuve du câblage DOM
 
 ### Faits vérifiés dans l'environnement, jamais supposés

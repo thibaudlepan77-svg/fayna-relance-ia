@@ -19,7 +19,11 @@ const path = require("path");
 const https = require("https");
 
 const ROOT = __dirname;
-const URL_PUBLIQUE = "https://thibaudlepan77-svg.github.io/fayna-relance-ia/";
+// La demo vit desormais a une adresse PROPRE. La racine est reservee a la future page de
+// vente (critere n° 1 du rang 1, bloque par A1). Sans cette separation, le jour de sa
+// publication, « Ouvrir la demonstration » aurait silencieusement servi la page de vente.
+const URL_RACINE = "https://thibaudlepan77-svg.github.io/fayna-relance-ia/";
+const URL_PUBLIQUE = URL_RACINE + "demo.html";
 
 // Faits canoniques, source : cerveau\projets\chiffrage-bareme-modules.md (contact canonique)
 const TEL_CANONIQUE = "221784266546";
@@ -326,6 +330,38 @@ function verifierEnLigne() {
   });
 }
 
+/* ---------- 7 bis. La racine historique mene-t-elle ENCORE a la demo ? ----------
+ * Toute la communication deja partie (README, page offre du rang 2, messages) porte
+ * l'adresse racine. La deplacer sans garantir le renvoi, c'est perdre les prospects
+ * qui detiennent l'ancien lien. On ne l'espere pas, on le mesure.
+ * https.get NE SUIT PAS les redirections : c'est bien le corps servi a la racine
+ * qui est examine, pas celui de la destination.
+ */
+function verifierRacine() {
+  return new Promise((resolve) => {
+    https.get(URL_RACINE, (res) => {
+      let corps = "";
+      res.on("data", (c) => (corps += c));
+      res.on("end", () => {
+        ok(res.statusCode === 200, "racine repond 200 (recu " + res.statusCode + ")");
+        ok(/http-equiv=["']refresh["'][^>]*url=demo\.html/i.test(corps),
+           "la racine renvoie automatiquement vers demo.html");
+        // Un renvoi automatique seul ne suffit pas : navigateurs durcis et lecteurs
+        // d'ecran peuvent l'ignorer. Il faut un lien CLIQUABLE de secours.
+        ok(/<a[^>]+href=["']demo\.html["']/i.test(corps),
+           "la racine porte un lien de secours cliquable vers demo.html");
+        // La racine est un tremplin, jamais un endroit ou l'on reste : elle ne doit
+        // porter ni tarif ni argumentaire, l'axe reserve cela a la page de vente (A1).
+        ok(!corps.includes("FCFA"), "aucun tarif sur la page de renvoi");
+        resolve();
+      });
+    }).on("error", (e) => {
+      ok(false, "racine injoignable : " + e.message);
+      resolve();
+    });
+  });
+}
+
 /* ---------- Auto-test : prouver que le harnais PEUT virer au rouge (LECON 18) ---------- */
 function autoTestRouge() {
   const mutations = [
@@ -399,7 +435,7 @@ function autoTestRouge() {
   if (args.includes("--rouge")) return autoTestRouge();
 
   controler(lire("index.html"), lire("demo.html"), lire("OBJECTIONS.md"), lire("PARCOURS-ENTREE.md"));
-  if (args.includes("--live")) await verifierEnLigne();
+  if (args.includes("--live")) { await verifierEnLigne(); await verifierRacine(); }
 
   console.log("FAYNA — harnais de preuve");
   console.log("  verts  : " + pass);
