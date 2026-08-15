@@ -3,7 +3,10 @@
 Outil libre (licence MIT) de relance des impayés pour les PME et commerçants du Sénégal.
 Messages de relance gradués sur 5 niveaux, en français et en wolof, prêts à envoyer par WhatsApp.
 
-**Ouvrir la démo :** https://thibaudlepan77-svg.github.io/fayna-relance-ia/
+**Ouvrir la démo :** https://thibaudlepan77-svg.github.io/fayna-relance-ia/demo.html
+
+L'adresse racine `…/fayna-relance-ia/` redirige vers cette page. Elle est réservée à la future
+page de vente : c'est pourquoi la démonstration porte une adresse propre qui, elle, ne bougera plus.
 
 - Aucun compte, aucune inscription. Trois dossiers **fictifs** sont chargés d'emblée.
 - Tout reste dans votre navigateur. Rien n'est envoyé, tant que l'option IA reste désactivée —

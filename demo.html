@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src https://api.groq.com https://generativelanguage.googleapis.com; manifest-src 'self'">
+<title>FAYNA, assistant de relance des impayés pour PME et commerçants du Sénégal</title>
+<meta name="description" content="FAYNA aide les PME et commerçants du Sénégal à récupérer leurs impayés : messages de relance graduels, bilingues français et wolof, prêts à envoyer par WhatsApp. Hors-ligne, aucune donnée envoyée.">
+<meta name="theme-color" content="#0b6b3a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="FAYNA, relancez vos impayés en un clic par WhatsApp">
+<meta property="og:description" content="Messages de relance graduels et bilingues (français / wolof) pour les PME et commerçants du Sénégal. Fonctionne hors-ligne : sans l'option IA, aucune donnée ne quitte votre téléphone.">
+<meta property="og:locale" content="fr_SN">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "FAYNA",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web (navigateur)",
+  "inLanguage": ["fr", "wo"],
+  "description": "Assistant de relance des impayés pour les PME et commerçants du Sénégal. Génère des messages de relance graduels, bilingues français et wolof, prêts à envoyer par WhatsApp. Fonctionne entièrement hors-ligne ; sans l'option IA (désactivée par défaut), aucune donnée client ne quitte l'appareil.",
+  "featureList": [
+    "Relances graduelles en 5 niveaux d'escalade",
+    "Messages bilingues français et wolof",
+    "Envoi en un clic par WhatsApp",
+    "Priorisation des impayés par montant à risque",
+    "Proposition d'échéancier de paiement négocié",
+    "Cadence de relance conseillée par niveau d'escalade",
+    "Fonctionnement hors-ligne, données stockées localement"
+  ],
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "XOF",
+    "description": "Outil de démonstration gratuit. La mise en vente d'un abonnement reste à la charge de l'éditeur."
+  }
+}
+</script>
+<style>
+:root{
+  --bg:#f5f7f6; --surface:#ffffff; --surface-2:#eef2f0; --text:#12211a; --muted:#4a5b52;
+  --brand:#0b6b3a; --brand-ink:#ffffff; --accent:#0a7d63; --line:#d3ddd7;
+  --warn-bg:#fff6e5; --warn-ink:#6b4a05; --warn-line:#e6c777;
+  --wa:#0f7a41; --wa-ink:#ffffff; --danger:#a01f1f; --chip:#e6efe9; --chip-ink:#0b5c33;
+  --radius:14px; --shadow:0 1px 3px rgba(10,40,25,.09),0 8px 24px rgba(10,40,25,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0d1512; --surface:#141f1a; --surface-2:#1b2922; --text:#eaf2ee; --muted:#a9bcb2;
+    --brand:#3fbb7f; --brand-ink:#05130c; --accent:#57cfa6; --line:#28382f;
+    --warn-bg:#2a2410; --warn-ink:#f2d38a; --warn-line:#5c4d1e;
+    --wa:#3fbb7f; --wa-ink:#05130c; --danger:#f0837f; --chip:#17281f; --chip-ink:#8fe6ba;
+    --shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55;font-size:16px}
+a{color:var(--accent)}
+.skip{position:absolute;left:-999px;top:0;background:var(--brand);color:var(--brand-ink);padding:.6rem 1rem;border-radius:0 0 8px 0;z-index:20}
+.skip:focus{left:0}
+header.top{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(14px,4vw,28px)}
+.bar{display:flex;align-items:center;gap:.7rem;padding:.7rem 0}
+.logo{display:flex;align-items:center;gap:.55rem;font-weight:800;font-size:1.2rem;letter-spacing:.3px;color:var(--text);text-decoration:none}
+.logo .mark{width:30px;height:30px;flex:0 0 auto}
+.tagline{color:var(--muted);font-size:.85rem;margin-left:auto;text-align:right}
+main{padding:0 0 4rem}
+.hero{padding:2.2rem 0 1.2rem}
+.hero h1{font-size:clamp(1.5rem,4.4vw,2.3rem);line-height:1.15;margin:.2rem 0 .6rem;letter-spacing:-.3px}
+.hero p.lead{font-size:1.06rem;color:var(--muted);max-width:60ch;margin:.2rem 0 1rem}
+.pills{display:flex;flex-wrap:wrap;gap:.45rem;margin:.6rem 0 0}
+.pill{background:var(--chip);color:var(--chip-ink);border:1px solid var(--line);border-radius:999px;padding:.28rem .7rem;font-size:.82rem;font-weight:600}
+section{margin:1.6rem 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:clamp(1rem,3vw,1.4rem)}
+h2{font-size:1.22rem;margin:.1rem 0 .3rem;letter-spacing:-.2px}
+h2 .num{color:var(--brand);font-weight:800}
+.sub{color:var(--muted);margin:.1rem 0 1rem;font-size:.95rem}
+form .grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media (max-width:620px){form .grid{grid-template-columns:1fr}}
+label{display:block;font-weight:600;font-size:.86rem;margin:0 0 .28rem}
+input,select,textarea{width:100%;font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:.62rem .7rem}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hint{color:var(--muted);font-size:.78rem;margin:.28rem 0 0}
+.row-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid transparent;padding:.62rem 1rem;font-weight:700}
+.btn-primary{background:var(--brand);color:var(--brand-ink)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn-wa{background:var(--wa);color:var(--wa-ink);display:inline-flex;align-items:center;gap:.4rem}
+.btn-sm{padding:.42rem .7rem;font-size:.85rem;font-weight:600;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+@media (max-width:620px){.kpis{grid-template-columns:1fr}}
+.kpi{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:.9rem}
+.kpi .v{font-size:1.5rem;font-weight:800;letter-spacing:-.5px}
+.kpi .k{color:var(--muted);font-size:.82rem}
+.empty{color:var(--muted);text-align:center;padding:1.6rem;border:1px dashed var(--line);border-radius:12px}
+.debtor{border:1px solid var(--line);border-radius:12px;padding:1rem;margin:.8rem 0;background:var(--surface)}
+.debtor.paye{opacity:.62}
+.dh{display:flex;align-items:flex-start;gap:.6rem;flex-wrap:wrap}
+.dh .name{font-weight:800;font-size:1.05rem}
+.dh .amt{font-weight:800;color:var(--brand);margin-left:auto;white-space:nowrap}
+.meta{color:var(--muted);font-size:.85rem;margin:.2rem 0 .1rem}
+.lvl{display:inline-block;border-radius:999px;padding:.2rem .6rem;font-size:.76rem;font-weight:700;border:1px solid var(--line)}
+.lvl0{background:var(--chip);color:var(--chip-ink)}
+.lvl1{background:#e6efe9;color:#0b5c33}
+.lvl2{background:#fff6e5;color:#6b4a05;border-color:var(--warn-line)}
+.lvl3{background:#ffe9d6;color:#7a3d05;border-color:#e6a56a}
+.lvl4{background:#fbe0df;color:#8a1a1a;border-color:#e09a97}
+@media (prefers-color-scheme: dark){
+  .lvl1{background:#17281f;color:#8fe6ba}
+  .lvl2{background:#2a2410;color:#f2d38a;border-color:#5c4d1e}
+  .lvl3{background:#2e2112;color:#f0b57e;border-color:#6b4a1e}
+  .lvl4{background:#2c1616;color:#f0a3a0;border-color:#6b2e2c}
+}
+.tabs{display:flex;gap:.35rem;margin:.7rem 0 .4rem}
+.tab{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:.32rem .7rem;font-size:.82rem;font-weight:600}
+.tab[aria-selected="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.msg{white-space:pre-wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:.8rem;font-size:.95rem}
+.acts{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem;align-items:center}
+.acts .spacer{margin-left:auto}
+.hist{color:var(--muted);font-size:.8rem;margin:.6rem 0 0;padding-top:.5rem;border-top:1px dashed var(--line)}
+.hist strong{color:var(--text)}
+.cadence{color:var(--muted);font-size:.82rem;margin:.35rem 0 0}
+.cadence strong{color:var(--text)}
+.ech{margin-top:.7rem;border-top:1px dashed var(--line);padding-top:.5rem}
+.ech>summary{cursor:pointer;font-weight:600;font-size:.85rem;color:var(--accent)}
+.ech[open]>summary{margin-bottom:.5rem}
+.ech-controls{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end}
+.ech-controls .fld{display:flex;flex-direction:column;gap:.2rem}
+.ech-controls label{font-weight:600;font-size:.78rem;margin:0}
+.ech-controls select{width:auto;min-width:130px}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+.table-scroll:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.ech-table{width:100%;border-collapse:collapse;margin:.6rem 0;font-size:.86rem}
+.ech-table caption{text-align:left;color:var(--muted);font-size:.82rem;padding:.2rem 0}
+.ech-table th,.ech-table td{padding:.34rem .5rem;border-bottom:1px solid var(--line);text-align:left}
+.ech-table td.num,.ech-table th.num{text-align:right;white-space:nowrap}
+.ech-table tfoot td{font-weight:700;border-bottom:none}
+.ech-out{margin-top:.4rem}
+.editing{outline:3px solid var(--accent);outline-offset:2px}
+.toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:.6rem 1rem;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;font-weight:600}
+.toast.show{opacity:1}
+.callout{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line);border-radius:12px;padding:.9rem 1rem;font-size:.9rem}
+/* Bandeau de demo publique. Reutilise la paire de contraste deja auditee de .callout. */
+.bandeau-demo{background:var(--warn-bg);color:var(--warn-ink);border-bottom:1px solid var(--warn-line);font-size:.9rem}
+.bandeau-demo .wrap{padding:.6rem clamp(1rem,4vw,2rem)}
+.callout strong{color:inherit}
+details.ai summary{cursor:pointer;font-weight:700}
+details.ai[open] summary{margin-bottom:.6rem}
+.ck{display:flex;align-items:center;gap:.5rem;margin-top:.7rem;min-height:44px}
+.ck input{width:22px;height:22px;flex:0 0 auto;accent-color:var(--brand)}
+.ck label{margin:0;font-weight:600;font-size:.86rem}
+.ia-chip{display:inline-flex;align-items:center;gap:.3rem;background:var(--chip);color:var(--chip-ink);border:1px solid var(--line);border-radius:999px;padding:.2rem .6rem;font-size:.76rem;font-weight:700;margin-top:.5rem}
+.ia-refus{margin-top:.6rem}
+/* Reutilise la paire de contraste deja auditee de .callout : aucun nouveau couple a verifier. */
+.champ-suspect{margin:.2rem 0 .6rem}
+footer{border-top:1px solid var(--line);margin-top:2rem;padding:1.6rem 0;color:var(--muted);font-size:.85rem}
+footer .legal{max-width:75ch}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.two{display:grid;grid-template-columns:1.15fr .85fr;gap:1.2rem}
+@media (max-width:840px){.two{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .toast{transition:none}
+  *{scroll-behavior:auto !important}
+}
+/* Mise en demeure formelle (fenetre + document imprimable) */
+.mep-overlay{display:none;position:fixed;inset:0;background:rgba(6,15,11,.55);z-index:40;padding:1.2rem;overflow:auto}
+.mep-overlay.open{display:block}
+.mep-sheet{max-width:820px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.mep-toolbar{display:flex;align-items:center;gap:.5rem;padding:.7rem .9rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);border-radius:12px 12px 0 0;flex-wrap:wrap}
+.mep-tspacer{margin-left:auto}
+.mep-doc{padding:clamp(1.2rem,4vw,2.6rem);background:#ffffff;color:#12211a;font-family:Georgia,"Times New Roman",serif;line-height:1.6}
+.mep-doc h3{font-size:1.15rem;margin:.6rem 0 1.2rem;text-align:center;text-transform:uppercase;letter-spacing:.5px}
+.mep-doc .mep-head{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.mep-doc .mep-to{margin:1rem 0}
+.mep-doc .mep-mode{font-size:.82rem;color:#555555;text-transform:uppercase;letter-spacing:.4px}
+.mep-doc .mep-obj{font-weight:700;margin:1rem 0}
+.mep-doc p{margin:.7rem 0;text-align:justify}
+.mep-doc .mep-sign{margin-top:1.8rem}
+.mep-doc .mep-note{margin-top:1.8rem;padding-top:.9rem;border-top:1px solid #cccccc;font-size:.82rem;color:#555555;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+@media print{
+  header.top,main,footer,.toast{display:none !important}
+  .mep-overlay{position:static !important;display:block !important;background:#ffffff !important;padding:0 !important;overflow:visible !important}
+  .mep-overlay:not(.open){display:none !important}
+  .mep-sheet{max-width:100% !important;margin:0 !important;border:none !important;box-shadow:none !important}
+  .mep-toolbar{display:none !important}
+  .mep-doc{padding:0 !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#app">Aller à l'outil</a>
+<div class="bandeau-demo" role="note" id="bandeau-demo">
+  <div class="wrap"><strong>Démonstration publique.</strong> Les trois dossiers affichés sont <strong>fictifs</strong> et les numéros ne joignent personne. Rien n'est envoyé, tout reste dans ce navigateur. La démo accepte <strong>5 dossiers au maximum</strong>&#8239;; la version complète n'a pas de limite.</div>
+</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="logo" href="#top" id="top" aria-label="FAYNA, accueil">
+      <svg class="mark" viewBox="0 0 32 32" role="img" aria-hidden="true" focusable="false">
+        <rect x="1" y="1" width="30" height="30" rx="8" fill="var(--brand)"></rect>
+        <path d="M10 9h12v3.4h-8.2v3.1H21v3.4h-7.2V23H10z" fill="var(--brand-ink)"></path>
+      </svg>
+      <span>FAYNA</span>
+    </a>
+    <span class="tagline">Relancez vos impayés,<br>en un clic, par WhatsApp</span>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <section class="hero" aria-labelledby="h1">
+    <h1 id="h1">Vos clients vous doivent de l'argent. FAYNA les relance à votre place.</h1>
+    <p class="lead">Un assistant simple pour les PME et commerçants du Sénégal. Vous saisissez qui vous doit combien&#8239;; FAYNA rédige le bon message de relance, au bon ton, en français et en wolof, prêt à envoyer par WhatsApp. Tout reste sur votre appareil.</p>
+    <div class="pills" aria-label="Points forts">
+      <span class="pill">100&#8239;% hors-ligne</span>
+      <span class="pill">Français et wolof</span>
+      <span class="pill">Envoi WhatsApp en 1 clic</span>
+      <span class="pill">Wave et Orange Money</span>
+      <span class="pill">Aucune donnée envoyée</span>
+    </div>
+  </section>
+
+  <section class="card" id="app" aria-labelledby="h-app">
+    <h2 id="h-app"><span class="num">1.</span> Vos impayés en cours</h2>
+    <p class="sub">Les relances à envoyer en priorité apparaissent en haut (plus gros montant, plus ancien retard).</p>
+    <div class="kpis" role="group" aria-label="Indicateurs">
+      <div class="kpi"><div class="v" id="kpi-total">0 FCFA</div><div class="k">Total en souffrance</div></div>
+      <div class="kpi"><div class="v" id="kpi-nb">0</div><div class="k">Relances à envoyer</div></div>
+      <div class="kpi"><div class="v" id="kpi-old">&#8211;</div><div class="k">Plus ancien retard</div></div>
+    </div>
+    <div id="list" style="margin-top:1rem"></div>
+  </section>
+
+  <div class="two">
+    <section class="card" aria-labelledby="h-add">
+      <h2 id="h-add"><span class="num">2.</span> Ajouter un client qui doit</h2>
+      <p class="sub">Les informations sont enregistrées dans ce navigateur uniquement. Rien ne quitte votre téléphone, sauf si vous activez l'option IA (voir Réglages). <strong>Dans cette démonstration, la liste est plafonnée à 5 dossiers.</strong></p>
+      <form id="form" novalidate>
+        <div class="grid">
+          <div>
+            <label for="f-nom">Nom du client</label>
+            <input id="f-nom" name="nom" autocomplete="off" required placeholder="Ex. Boutique Ndiaye">
+          </div>
+          <div>
+            <label for="f-tel">WhatsApp du client</label>
+            <input id="f-tel" name="tel" inputmode="tel" autocomplete="off" placeholder="77 123 45 67">
+            <p class="hint">Indicatif Sénégal (+221) ajouté si absent.</p>
+          </div>
+          <div>
+            <label for="f-montant">Montant dû</label>
+            <input id="f-montant" name="montant" inputmode="numeric" required placeholder="150000">
+            <p class="hint">En FCFA, chiffres seulement.</p>
+          </div>
+          <div>
+            <label for="f-echeance">Date d'échéance</label>
+            <input id="f-echeance" name="echeance" type="date" required>
+          </div>
+          <div>
+            <label for="f-langue">Langue du message</label>
+            <select id="f-langue" name="langue">
+              <option value="bi">Français + wolof</option>
+              <option value="fr">Français</option>
+              <option value="wo">Wolof</option>
+            </select>
+          </div>
+          <div>
+            <label for="f-relation">Relation avec le client</label>
+            <select id="f-relation" name="relation">
+              <option value="habituel">Client habituel (ton chaleureux)</option>
+              <option value="nouveau">Nouveau client (ton neutre)</option>
+              <option value="sensible">Situation délicate (ton empathique)</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-actions">
+          <button type="submit" class="btn-primary" id="btn-submit">Ajouter et générer la relance</button>
+          <button type="button" class="btn-ghost" id="btn-cancel-edit" hidden>Annuler la modification</button>
+          <button type="button" class="btn-ghost" id="btn-demo">Charger un exemple</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="h-set">
+      <h2 id="h-set"><span class="num">3.</span> Vos réglages</h2>
+      <p class="sub">Ces réglages personnalisent la signature et le moyen de paiement proposé dans chaque message.</p>
+      <label for="s-exp">Votre nom ou entreprise (signature)</label>
+      <input id="s-exp" autocomplete="off" placeholder="Ex. Entreprise Diallo & Fils">
+      <label for="s-canal" style="margin-top:.7rem">Moyen de paiement propose</label>
+      <input id="s-canal" autocomplete="off" placeholder="Wave ou Orange Money">
+      <label for="s-lieu" style="margin-top:.7rem">Ville (pour la mise en demeure)</label>
+      <input id="s-lieu" autocomplete="off" placeholder="Dakar">
+      <p class="hint">Sert de lieu d'émission sur la mise en demeure imprimable.</p>
+      <div class="row-actions">
+        <button type="button" class="btn-ghost btn-sm" id="btn-export">Exporter en CSV</button>
+        <button type="button" class="btn-ghost btn-sm" id="btn-clear">Tout effacer</button>
+      </div>
+
+      <details class="ai" style="margin-top:1.1rem">
+        <summary>Option avancée&#8239;: personnaliser avec l'IA</summary>
+        <p class="sub" style="margin-top:.6rem">FAYNA fonctionne parfaitement sans IA. Si vous voulez des messages encore plus personnalisés, vous pouvez brancher votre <strong>propre clé gratuite</strong> (Groq recommandé, il n'entraîne pas ses modèles sur vos données). La clé n'est jamais transmise à FAYNA.</p>
+        <div class="callout" style="margin-bottom:.7rem"><strong>Vie privée&#8239;:</strong> avec l'IA activée, le nom du client, le montant et le message sont envoyés au fournisseur choisi pour être reformulés. Sans IA, rien n'est jamais envoyé. Ces informations concernent une <strong>autre personne que vous</strong>, votre débiteur&#8239;: au sens de la loi sénégalaise n&#186;&#8239;2008-12 sur la protection des données à caractère personnel, c'est vous qui en répondez. N'activez l'IA que si vous l'assumez.</div>
+        <div class="callout" style="margin-bottom:.7rem"><strong>Garde-fou&#8239;:</strong> chaque réécriture est ensuite contrôlée <strong>mécaniquement, sans IA</strong>. Si le modèle change un montant ou une date, invente un chiffre, ajoute une menace, une pénalité, une promesse ou un lien, ou supprime votre signature, la réécriture est <strong>refusée</strong> et le message d'origine est conservé.</div>
+        <label for="ai-prov">Fournisseur</label>
+        <select id="ai-prov">
+          <option value="groq">Groq (recommandé, sans entraînement)</option>
+          <option value="gemini">Google Gemini (gratuit, mais entraîne sur les données)</option>
+        </select>
+        <label for="ai-key" style="margin-top:.6rem">Votre clé API gratuite</label>
+        <input id="ai-key" type="password" autocomplete="off" placeholder="Collez votre clé ici">
+        <p class="hint">Obtenez une clé gratuite sur console.groq.com (Groq) ou aistudio.google.com (Gemini). Aucune carte requise.</p>
+        <div class="ck">
+          <input type="checkbox" id="ai-remember">
+          <label for="ai-remember">Se souvenir de ma clé dans ce navigateur</label>
+        </div>
+        <p class="hint">Décochée, la clé reste en mémoire le temps de l'onglet et n'est jamais enregistrée. Sur un appareil partagé, laissez décochée.</p>
+      </details>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="h-how">
+    <h2 id="h-how"><span class="num">4.</span> Comment ça marche</h2>
+    <p class="sub">FAYNA suit une escalade de politesse en 5 niveaux, du rappel amical au dernier avertissement avant recouvrement. Vous gardez toujours le contrôle&#8239;: rien n'est envoyé automatiquement.</p>
+    <ol style="margin:0;padding-left:1.2rem;color:var(--muted)">
+      <li><strong>Rappel préventif</strong>&#8239;: à l'approche de l'échéance, un mot courtois.</li>
+      <li><strong>Premier rappel</strong>&#8239;: quelques jours de retard, ton amical.</li>
+      <li><strong>Relance ferme</strong>&#8239;: 2 à 4 semaines, demande d'une date de règlement.</li>
+      <li><strong>Mise en demeure amiable</strong>&#8239;: 1 à 2 mois, délai formel de 8 jours.</li>
+      <li><strong>Dernier avertissement</strong>&#8239;: au-delà, avant transmission pour recouvrement.</li>
+    </ol>
+    <p class="sub" style="margin-top:.9rem">À partir de la relance ferme, vous pouvez générer un <strong>modèle de mise en demeure imprimable</strong> (montant en toutes lettres), à adresser en recommandé avec accusé de réception ou à faire signifier par un huissier de justice. C'est un modèle de lettre, pas un acte d'avocat&#8239;: faites-le relire par un professionnel du droit avant tout envoi.</p>
+    <p class="sub" style="margin-top:.6rem">Un client ne peut pas tout payer d'un coup&#8239;? Dès qu'un retard apparaît, FAYNA propose un <strong>échéancier de paiement négocié</strong>&#8239;: vous choisissez le nombre de versements et la fréquence, et l'outil répartit le montant dû au franc près (la somme des versements est exactement égale à la dette), avec un message de proposition prêt à envoyer. Chaque impayé affiche aussi une <strong>cadence de relance conseillée</strong> pour savoir quand relancer sans harceler.</p>
+  </section>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap legal">
+    <p><strong>FAYNA</strong> est un outil d'aide à la relance amiable. Il n'est ni un cabinet de recouvrement, ni un huissier, et ne garantit aucun résultat de paiement. Le recouvrement forcé (saisies, injonction de payer) relève des procédures OHADA et du monopole de l'huissier de justice&#8239;: consultez un professionnel pour cette étape.</p>
+    <p>Aucune donnée client n'est transmise à un serveur&#8239;: tout est stocké dans votre navigateur. La fonction IA optionnelle envoie du texte au fournisseur que vous choisissez, avec votre propre clé. Vérifiez toujours un message avant de l'envoyer. Les montants et dates sont ceux que vous saisissez.</p>
+    <p>Vous saisissez ici les données personnelles de vos débiteurs (nom, téléphone, dette). Vous en êtes le responsable de traitement au sens de la <strong>loi sénégalaise n&#186;&#8239;2008-12</strong>&#8239;: ne collectez que le nécessaire, ne le communiquez pas à des tiers, et effacez ce qui ne sert plus (bouton «&#8239;Tout effacer&#8239;»).</p>
+    <p>Démonstration &#183; Sénégal &#183; FCFA, Wave, Orange Money, WhatsApp. La mise en vente d'un abonnement et l'envoi effectif des messages restent des actions de l'éditeur et de l'utilisateur.</p>
+    <p>FAYNA est un outil libre (licence MIT) développé par <strong>Jaayleer</strong>, à Dakar. Une question, un besoin sur mesure&#8239;? Écrivez à <a href="mailto:contact@jaayleer.com">contact@jaayleer.com</a> ou sur WhatsApp au <a href="https://wa.me/221784266546">+221&#8239;78&#8239;426&#8239;65&#8239;46</a>.</p>
+  </div>
+</footer>
+
+<div class="mep-overlay" id="mep-overlay" role="presentation">
+  <div class="mep-sheet" role="dialog" aria-modal="true" aria-labelledby="mep-h">
+    <div class="mep-toolbar">
+      <strong id="mep-h">Mise en demeure</strong>
+      <span class="mep-tspacer"></span>
+      <button type="button" class="btn-primary btn-sm" id="mep-print">Imprimer / Enregistrer en PDF</button>
+      <button type="button" class="btn-ghost btn-sm" id="mep-close">Fermer</button>
+    </div>
+    <article class="mep-doc" id="mep-doc" tabindex="-1"></article>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/*ENGINE_START*/
+var FAYNA_ENGINE = (function () {
+  "use strict";
+  var NBSP = " ";   // insecable
+  var FINE = " ";   // fine insecable
+  var MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+
+  function fmtMontant(n) {
+    var v = Math.round(Number(n) || 0);
+    var neg = v < 0; v = Math.abs(v);
+    var s = String(v);
+    var out = "";
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 === 0) out += FINE;
+      out += s[i];
+    }
+    return (neg ? "-" : "") + out + NBSP + "FCFA";
+  }
+
+  function parseISO(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || "").trim());
+    if (!m) return null;
+    return Date.UTC(+m[1], +m[2] - 1, +m[3]);
+  }
+
+  function fmtDateFr(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || "").trim());
+    if (!m) return "";
+    return (+m[3]) + NBSP + MOIS[+m[2] - 1] + NBSP + m[1];
+  }
+
+  function joursRetard(echeance, aujourdhui) {
+    var a = parseISO(echeance), b = parseISO(aujourdhui);
+    if (a === null || b === null) return 0;
+    return Math.round((b - a) / 86400000);
+  }
+
+  // 0 preventif, 1 premier rappel, 2 relance ferme, 3 mise en demeure, 4 dernier avertissement
+  function niveau(jours) {
+    if (jours <= 2) return 0;
+    if (jours <= 14) return 1;
+    if (jours <= 30) return 2;
+    if (jours <= 60) return 3;
+    return 4;
+  }
+
+  var NIVEAUX = [
+    { code: 0, labelFr: "Rappel préventif" },
+    { code: 1, labelFr: "Premier rappel" },
+    { code: 2, labelFr: "Relance ferme" },
+    { code: 3, labelFr: "Mise en demeure amiable" },
+    { code: 4, labelFr: "Dernier avertissement" }
+  ];
+
+  // cout d'ignorance : le montant, amplifie par l'anciennete (plafond a 120 jours, x3)
+  function prioriteScore(montant, jours) {
+    var m = Math.max(0, Number(montant) || 0);
+    var j = Math.max(0, Math.min(120, jours));
+    return Math.round(m * (1 + (j / 120) * 2));
+  }
+
+  function normTel(tel) {
+    var d = String(tel || "").replace(/[^\d]/g, "");
+    if (!d) return "";
+    if (d.indexOf("00") === 0) d = d.slice(2);
+    if (d.indexOf("221") === 0) return d;
+    if (d.length === 9) return "221" + d;      // numero senegalais local
+    return d;
+  }
+
+  function lienWhatsapp(tel, texte) {
+    var n = normTel(tel);
+    var base = n ? ("https://wa.me/" + n) : "https://wa.me/";
+    return base + "?text=" + encodeURIComponent(String(texte || ""));
+  }
+
+  function tonEntree(relation) {
+    if (relation === "sensible") return { frFr: "J'espère que tout va bien pour vous. ", woFr: "Yalla na nga ci jàmm. " };
+    if (relation === "nouveau") return { frFr: "", woFr: "" };
+    return { frFr: "J'espère que vous allez bien. ", woFr: "Naka nga def? " };
+  }
+
+  /**
+   * Assainit un champ libre AVANT de l'inserer dans un message.
+   *
+   * Le nom du client, l'expediteur et le canal de paiement sont des donnees NON FIABLES : ils
+   * arrivent d'une saisie, d'un import CSV ou d'un tiers. Sans traitement, un nom tel que
+   * « Diop. Nous saisirons vos biens par huissier. » se coule dans la phrase et fait dire au
+   * message ce que l'utilisateur n'a jamais ecrit. Le garde-fou de sortie IA ne voit rien : il
+   * n'interdit au modele que d'AJOUTER un terme, or celui-ci est deja dans le message d'origine.
+   * La contamination doit donc etre stoppee a la SOURCE, pas au retour du modele.
+   *
+   * On ne rejette pas et on ne censure pas : une raison sociale peut legitimement contenir
+   * « Étude d'Huissier Ndiaye » ou « Cabinet d'Avocats Diop ». On retire seulement ce qui permet
+   * au champ de S'ECHAPPER de son emplacement : sauts de ligne (forgerait une signature),
+   * caracteres de controle, ponctuation de fin de phrase, et longueur demesuree. Ce qui reste de
+   * suspect est SIGNALE a l'utilisateur par `champsSuspects`, jamais efface en douce.
+   */
+  var CHAMP_MAX = 60;
+  function nettoyerChampLibre(s, max) {
+    var t = String(s == null ? "" : s);
+    t = t.replace(/[\u0000-\u001f\u2028\u2029]+/g, " ");        // controle, separateurs de ligne
+    t = t.replace(/https?:\/\/\S+|www\.\S+|\S+@\S+\.\S+/gi, " ");    // aucune raison sociale ne contient de lien
+    t = t.replace(/[!?;]+/g, " ");                                  // ne peut ni exclamer ni interroger
+    // Un point qui suit deux caracteres ou plus clot une phrase : on le retire. Un point qui suit
+    // une seule lettre est un sigle (« S.A.R.L. », « B.P. ») : on le garde.
+    t = t.replace(/(\w{2,})\.(?=\s|$)/g, "$1 ");
+    t = t.replace(/\s+/g, " ").trim();                              // une seule ligne, espaces normalises
+    var m = Number(max) > 0 ? Number(max) : CHAMP_MAX;
+    if (t.length > m) t = t.slice(0, m).trim();
+    return t;
+  }
+
+  function genererMessage(d) {
+    var nom = nettoyerChampLibre(d.nom) || "cher client";
+    var exp = nettoyerChampLibre(d.expediteur) || "[Votre entreprise]";
+    var canal = nettoyerChampLibre(d.canalPaiement) || "Wave ou Orange Money";
+    var jours = joursRetard(d.echeance, d.aujourdhui);
+    var niv = niveau(jours);
+    var montant = fmtMontant(d.montant);
+    var dateFr = fmtDateFr(d.echeance);
+    var t = tonEntree(d.relation);
+    var jAbs = Math.abs(jours);
+    var jTxt = jAbs + (jAbs > 1 ? " jours" : " jour");
+    var fr, wo;
+
+    switch (niv) {
+      case 0:
+        fr = "Bonjour " + nom + ", " + t.frFr + "petit rappel : la facture de " + montant +
+             " arrive à échéance le " + dateFr + ". Vous pouvez régler par " + canal +
+             ". Merci de votre confiance.\n" + exp;
+        wo = "Salaam " + nom + ". " + t.woFr + "Rappel bu neex : facture bi " + montant +
+             " dafay jot ci " + dateFr + ". Man nga fey ci " + canal + ". Jërëjëf.\n" + exp;
+        break;
+      case 1:
+        fr = "Bonjour " + nom + ", " + t.frFr + "je reviens vers vous au sujet de la facture de " + montant +
+             ", échue depuis le " + dateFr + " (" + jTxt + " de retard). Un règlement par " + canal +
+             " m'arrangerait beaucoup. Si c'est déjà fait, merci d'ignorer ce message.\n" + exp;
+        wo = "Salaam " + nom + ". " + t.woFr + "Facture bi " + montant + " jotoon na ci " + dateFr +
+             ", mu weesu (" + jTxt + "). Su la neexee, feyal ko ci " + canal +
+             ". Su fekkee fey nga ba noppi, baal nu ko. Jërëjëf.\n" + exp;
+        break;
+      case 2:
+        fr = "Bonjour " + nom + ", malgré mes précédents messages, la facture de " + montant +
+             " reste impayée depuis le " + dateFr + ", soit " + jTxt +
+             " de retard. Merci de procéder au règlement par " + canal +
+             " sous 72 heures, ou de me proposer une date ferme.\n" + exp;
+        wo = "Salaam " + nom + ". Teg ci samay message yi jiitu, facture bi " + montant +
+             " feyagul dara ba tey ci " + dateFr + " (" + jTxt + "). Nu ngi la ñaan nga fey ko ci " + canal +
+             " ci ñetti fan yii, walla nga jox nu benn bés bu wóor. Jërëjëf.\n" + exp;
+        break;
+      case 3:
+        fr = "Bonjour " + nom + ", sauf erreur de notre part, la somme de " + montant +
+             " demeure due depuis le " + dateFr + " (" + jTxt + " de retard). Par ce message, je vous mets en demeure de la régler par " + canal +
+             " sous 8 jours. À défaut, je serai contraint d'engager une procédure de recouvrement. Je reste ouvert à un arrangement amiable.\n" + exp;
+        wo = "Salaam " + nom + ". Su amul njumte ci sunu wet, xaalis bi " + montant +
+             " nga nu ameel feyagul ba tey (" + jTxt + "). Ci message bii, nu ngi la ñaan bu baax nga fey ko ci " + canal +
+             " ci juróom-ñetti fan. Su feyul, dinañu tambali ay démarche. Waaye nangu naa toll ak yow ci diggante bu neex.\n" + exp;
+        break;
+      default:
+        fr = "Bonjour " + nom + ", la facture de " + montant + ", échue depuis le " + dateFr +
+             " (" + jTxt + " de retard), n'a toujours pas été réglée malgré plusieurs relances et une mise en demeure. Sans règlement par " + canal +
+             " sous 48 heures, le dossier sera transmis pour recouvrement. Je préfère de loin une solution à l'amiable : contactez-moi aujourd'hui.\n" + exp;
+        wo = "Salaam " + nom + ". Facture bi " + montant + " feyagul ba tey (" + jTxt +
+             "), teg ci ay rappel ak benn mise en demeure. Su feyul ci " + canal +
+             " ci ñaari fan, dossier bi dañu koy yónnee ci recouvrement. Bëgg naa lool nu jubbanti ko ci diggante : woo ma tey.\n" + exp;
+    }
+    return { niveau: niv, jours: jours, fr: fr, wo: wo, montant: montant, dateFr: dateFr };
+  }
+
+  // --- Nombre en toutes lettres (francais, 0 a 999 999 999), pour la mise en demeure formelle ---
+  var UNITES = ["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix",
+    "onze","douze","treize","quatorze","quinze","seize","dix-sept","dix-huit","dix-neuf"];
+  var DIZAINES = ["","","vingt","trente","quarante","cinquante","soixante","","quatre-vingt",""];
+
+  function sousCent(n, avantMille) {
+    n = Math.floor(n);
+    if (n < 20) return UNITES[n];
+    var d = Math.floor(n / 10), u = n % 10;
+    if (d === 7 || d === 9) {                       // soixante-dix.. / quatre-vingt-dix..
+      if (d === 7 && u === 1) return "soixante et onze";
+      return (d === 7 ? "soixante" : "quatre-vingt") + "-" + UNITES[10 + u];
+    }
+    var t = DIZAINES[d];
+    if (u === 0) return (d === 8) ? (avantMille ? "quatre-vingt" : "quatre-vingts") : t;
+    if (u === 1 && d !== 8) return t + " et un";     // vingt et un.. soixante et un ; mais quatre-vingt-un
+    return t + "-" + UNITES[u];
+  }
+
+  function centaine(n, avantMille) {                 // 0..999 ; avantMille supprime le pluriel de "cent"
+    n = Math.floor(n);
+    if (n === 0) return "";
+    var c = Math.floor(n / 100), r = n % 100, out = "";
+    if (c > 0) {
+      out += (c === 1) ? "cent" : (UNITES[c] + " cent");
+      if (c > 1 && r === 0 && !avantMille) out += "s"; // deux cents, mais deux cent mille / deux cent trois
+      if (r > 0) out += " ";
+    }
+    if (r > 0) out += sousCent(r, avantMille);
+    return out;
+  }
+
+  function nombreEnLettres(num) {
+    num = Math.floor(Math.abs(Number(num) || 0));
+    if (num === 0) return "zéro";
+    if (num >= 1000000000) return String(num);       // hors plage : repli chiffres (securite)
+    var millions = Math.floor(num / 1000000);
+    var milliers = Math.floor((num % 1000000) / 1000);
+    var reste = num % 1000;
+    var parts = [];
+    if (millions > 0) parts.push(millions === 1 ? "un million" : (centaine(millions, false) + " millions"));
+    if (milliers > 0) parts.push(milliers === 1 ? "mille" : (centaine(milliers, true) + " mille"));
+    if (reste > 0) parts.push(centaine(reste, false));
+    return parts.join(" ");
+  }
+
+  function montantEnLettresFCFA(n) {
+    var v = Math.floor(Math.abs(Number(n) || 0));
+    return nombreEnLettres(v) + " franc" + (v > 1 ? "s" : "") + " CFA";
+  }
+
+  // --- Modele de mise en demeure amiable, deterministe, imprimable ---
+  // 2026-08-15 : le visa d'un texte de loi a ete RETIRE du corps du courrier. Un modele de lettre
+  // ne s'auto-certifie pas au regard d'une loi (la maison a deja paye cette erreur avec une
+  // facture qui se disait en regle avec le CGI, sur un document sans NINEA). Le renvoi au cadre
+  // legal reste dans les mentions du pied de page, ou il informe au lieu de certifier.
+  // Le harnais interdit desormais la formulation retiree, y compris dans ce commentaire :
+  // un fichier HTML publie livre ses commentaires au visiteur.
+  function genererMiseEnDemeure(d) {
+    var creancier = nettoyerChampLibre(d.expediteur) || "[Votre entreprise]";
+    var nom = nettoyerChampLibre(d.nom) || "[Client]";
+    var lieu = nettoyerChampLibre(d.lieu, 40) || "Dakar";
+    var canal = nettoyerChampLibre(d.canalPaiement) || "Wave ou Orange Money";
+    var jours = Math.max(0, joursRetard(d.echeance, d.aujourdhui));
+    var jTxt = jours + (jours > 1 ? " jours" : " jour");
+    var montantChiffres = fmtMontant(d.montant);
+    var montantLettres = montantEnLettresFCFA(d.montant);
+    var dateEcheance = fmtDateFr(d.echeance);
+    var dateJour = fmtDateFr(d.aujourdhui);
+    var delai = 8;
+    var paragraphes = [
+      "Sauf erreur de notre part ou règlement que nous n'aurions pas encore enregistré, nos comptes font " +
+        "apparaître à ce jour, à votre charge, une créance impayée d'un montant de " + montantChiffres +
+        " (en toutes lettres" + NBSP + ": " + montantLettres + "), échue depuis le " + dateEcheance +
+        ", soit " + jTxt + " de retard.",
+      "Par la présente, nous vous mettons en demeure de régler cette " +
+        "somme dans un délai de " + delai + " jours à compter de la réception du présent courrier, par " +
+        canal + " ou par tout autre moyen à votre convenance.",
+      "À défaut de règlement ou d'une proposition sérieuse d'échéancier dans ce délai, nous nous réservons le " +
+        "droit d'engager une procédure de recouvrement, notamment une requête en injonction de " +
+        "payer devant la juridiction compétente, ainsi que de réclamer les intérêts et frais prévus par " +
+        "nos conditions convenues, s'il en existe.",
+      "Nous privilégions néanmoins une issue amiable et restons à votre entière disposition pour convenir " +
+        "ensemble d'un arrangement adapté. Nous vous invitons à nous contacter sans délai.",
+      "Dans cette attente, nous vous prions d'agréer, " + nom + ", l'expression de nos salutations distinguées."
+    ];
+    var note = "Document préparé par le créancier à titre de mise en demeure amiable. Pour lui conférer une " +
+      "date certaine et une pleine valeur probante, il est recommandé de l'adresser par lettre recommandée avec " +
+      "accusé de réception, ou de le faire signifier par un huissier de justice. FAYNA n'est pas un cabinet de " +
+      "recouvrement et ne garantit aucun résultat.";
+    return {
+      creancier: creancier, destinataire: nom, lieu: lieu, dateJour: dateJour,
+      objet: "Mise en demeure de payer (créance échue)",
+      montantChiffres: montantChiffres, montantLettres: montantLettres,
+      dateEcheance: dateEcheance, jours: jours, delai: delai,
+      modeRecommande: "Lettre recommandée avec accusé de réception",
+      paragraphes: paragraphes, note: note
+    };
+  }
+
+  // --- Historique des relances envoyees (deterministe, pour le suivi par client) ---
+  function resumeRelances(relances) {
+    var arr = Array.isArray(relances) ? relances : [];
+    var last = null, valides = 0;
+    for (var i = 0; i < arr.length; i++) {
+      var iso = arr[i] && arr[i].date;
+      if (typeof iso === "string" && /^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+        valides++;
+        if (last === null || iso > last) last = iso;
+      }
+    }
+    return { nombre: arr.length, valides: valides, derniereDate: last };
+  }
+
+  // --- Arithmetique de dates deterministe (UTC), pour l'echeancier et la cadence ---
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
+  function addDaysISO(iso, n) {
+    var t = parseISO(iso);
+    if (t === null) return null;
+    var d = new Date(t + Math.round(Number(n) || 0) * 86400000);
+    return d.getUTCFullYear() + "-" + pad2(d.getUTCMonth() + 1) + "-" + pad2(d.getUTCDate());
+  }
+
+  function addMonthsISO(iso, n) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || "").trim());
+    if (!m) return null;
+    var total = (+m[2] - 1) + Math.round(Number(n) || 0);
+    var ny = +m[1] + Math.floor(total / 12);
+    var nm = ((total % 12) + 12) % 12;                 // 0..11
+    var dernier = new Date(Date.UTC(ny, nm + 1, 0)).getUTCDate();  // dernier jour du mois cible
+    var nd = Math.min(+m[3], dernier);                 // report du jour, borne au dernier jour (28..31)
+    return ny + "-" + pad2(nm + 1) + "-" + pad2(nd);
+  }
+
+  // --- Echeancier de paiement negocie (deterministe) : somme des versements === total exact ---
+  // Fractionne un impaye en N versements dont la somme reconstitue EXACTEMENT le montant du.
+  function genererEcheancier(montant, nombre, dateDebut, frequence) {
+    var total = Math.max(0, Math.round(Number(montant) || 0));
+    var n = Math.max(1, Math.min(24, Math.floor(Number(nombre) || 1)));
+    var freq = (frequence === "hebdomadaire" || frequence === "quinzaine") ? frequence : "mensuel";
+    var base = Math.floor(total / n);
+    var reste = total - base * n;                       // 0..n-1, reparti +1 sur les premiers versements
+    var echeances = [], somme = 0, cur = dateDebut;
+    for (var i = 0; i < n; i++) {
+      var mnt = base + (i < reste ? 1 : 0);            // ecart max 1 FCFA entre versements
+      somme += mnt;
+      echeances.push({
+        rang: i + 1, dateISO: cur, dateFr: cur ? fmtDateFr(cur) : "",
+        montant: mnt, montantFmt: fmtMontant(mnt)
+      });
+      if (freq === "mensuel") cur = addMonthsISO(cur, 1);
+      else if (freq === "quinzaine") cur = addDaysISO(cur, 14);
+      else cur = addDaysISO(cur, 7);
+    }
+    return {
+      total: total, montantFmt: fmtMontant(total), nombre: n, frequence: freq,
+      echeances: echeances, somme: somme, exact: somme === total
+    };
+  }
+
+  var FREQ_FR = { mensuel: "chaque mois", quinzaine: "tous les 15 jours", hebdomadaire: "chaque semaine" };
+  var FREQ_WO = { mensuel: "weer wu nekk", quinzaine: "ñaari ayubés yu nekk", hebdomadaire: "ayubés bu nekk" };
+
+  // Message de proposition d'echeancier, bilingue FR/wolof, honnete (aucun chiffre invente)
+  function genererMessageEcheancier(d) {
+    var nom = nettoyerChampLibre(d.nom) || "cher client";
+    var exp = nettoyerChampLibre(d.expediteur) || "[Votre entreprise]";
+    var canal = nettoyerChampLibre(d.canalPaiement) || "Wave ou Orange Money";
+    var plan = genererEcheancier(d.montant, d.nombre, d.dateDebut, d.frequence);
+    var lignesFr = plan.echeances.map(function (e) { return "- " + e.montantFmt + " avant le " + e.dateFr; }).join("\n");
+    var lignesWo = plan.echeances.map(function (e) { return "- " + e.montantFmt + " ba " + e.dateFr; }).join("\n");
+    var fr = "Bonjour " + nom + ", pour solder votre dette de " + plan.montantFmt +
+      " en douceur, je vous propose un échéancier en " + plan.nombre + " versements (" + FREQ_FR[plan.frequence] +
+      ") par " + canal + " :\n" + lignesFr +
+      "\nMerci de me confirmer votre accord ; je reste à votre écoute pour l'ajuster.\n" + exp;
+    var wo = "Salaam " + nom + ". Ngir fey sa bor bu " + plan.montantFmt + " ndànk, maa ngi la jox échéancier ci " +
+      plan.nombre + " yoon (" + FREQ_WO[plan.frequence] + ") ci " + canal + " :\n" + lignesWo +
+      "\nNangul ma ko su la neexee ; maa ngi ci sa kanam. Jërëjëf.\n" + exp;
+    return { plan: plan, fr: fr, wo: wo };
+  }
+
+  // --- Cadence : prochaine relance conseillee selon le niveau et la date de base ---
+  // Delais (jours) entre deux relances par niveau d'escalade 0..4.
+  var CADENCE = [3, 5, 7, 8, 2];
+  function prochaineRelanceConseillee(niveau, baseISO) {
+    var niv = Math.max(0, Math.min(4, Math.floor(Number(niveau) || 0)));
+    var delai = CADENCE[niv];
+    var dateISO = addDaysISO(baseISO, delai);
+    return { delai: delai, dateISO: dateISO, dateFr: dateISO ? fmtDateFr(dateISO) : "" };
+  }
+
+  // =========================================================================
+  // Couche IA optionnelle (BYOK) : prompt deterministe, appel robuste, GARDE-FOU de sortie.
+  //
+  // Principe : un modele de langage n'est JAMAIS une source de verite. Tout ce qui sort
+  // du fournisseur traverse un controle MECANIQUE, sans IA, avant d'etre affiche ou envoye.
+  // Une seule violation suffit a rejeter la reecriture : le message deterministe est conserve.
+  // C'est ce qui rend tenable la promesse du produit (aucun montant, aucune date, aucune
+  // menace, aucune promesse, aucun lien ne peut etre introduit par le modele).
+  // =========================================================================
+
+  // Cascade verifiee EN REEL le 2026-07-10 sur des cles gratuites neuves (docs/ia-live-c65.mjs).
+  // Cote Gemini, « gemini-2.5-flash » et « gemini-2.5-flash-lite » repondent 404 (« no longer
+  // available to new users »), « gemini-2.0-flash* » repond 429 (quota), « gemini-3-flash-preview »
+  // et « gemini-3.5-flash » repondent 503 (« high demand »). Un fournisseur gratuit n'offre donc
+  // aucun modele stable : la cascade est la seule facon de rester disponible, jamais un modele seul.
+  var IA_MODELES = {
+    groq: ["openai/gpt-oss-20b", "llama-3.3-70b-versatile"],   // repli si le modele est retire du catalogue
+    gemini: ["gemini-3.1-flash-lite", "gemini-flash-lite-latest", "gemini-2.0-flash"]
+  };
+  var IA_TIMEOUT_MS = 20000;
+  var IA_PAUSE_REJEU_MS = 1200;
+
+  function iaEndpoint(prov, cle, modele, prompt) {
+    if (prov === "gemini") {
+      return {
+        url: "https://generativelanguage.googleapis.com/v1beta/models/" + modele + ":generateContent",
+        options: {
+          method: "POST",
+          // cle en en-tete et non dans l'URL : pas de fuite en Referer, en historique ni en journal serveur
+          headers: { "Content-Type": "application/json", "x-goog-api-key": cle },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4 } })
+        }
+      };
+    }
+    return {
+      url: "https://api.groq.com/openai/v1/chat/completions",
+      options: {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + cle },
+        body: JSON.stringify({ model: modele, temperature: 0.4, messages: [{ role: "user", content: prompt }] })
+      }
+    };
+  }
+
+  function iaExtraire(prov, j) {
+    var t;
+    if (prov === "gemini") {
+      t = j && j.candidates && j.candidates[0] && j.candidates[0].content &&
+          j.candidates[0].content.parts && j.candidates[0].content.parts[0] && j.candidates[0].content.parts[0].text;
+    } else {
+      t = j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
+    }
+    return typeof t === "string" ? t.trim() : "";
+  }
+
+  function iaRejouable(s) { return s === 408 || s === 429 || s === 500 || s === 502 || s === 503 || s === 529; }
+  function iaModeleInconnu(s) { return s === 400 || s === 404; }
+
+  function iaMessageErreur(status) {
+    if (status === 401 || status === 403) return "clé refusée par le fournisseur";
+    if (status === 429) return "quota atteint, réessayez dans une minute";
+    if (status === 408) return "délai dépassé";
+    if (status >= 500) return "service du fournisseur indisponible";
+    return "erreur HTTP " + status;
+  }
+
+  // Appel robuste : delai maximal, abandon, un rejeu sur erreur transitoire, repli de modele.
+  // fetchImpl et pause sont injectables pour que la logique soit testable hors ligne.
+  function appelerIA(o) {
+    o = o || {};
+    var prov = o.prov === "gemini" ? "gemini" : "groq";
+    var cle = String(o.cle || "").trim();
+    var prompt = String(o.prompt || "").trim();
+    var fetchImpl = o.fetchImpl || (typeof fetch !== "undefined" ? fetch : null);
+    var timeoutMs = Number(o.timeoutMs) > 0 ? Number(o.timeoutMs) : IA_TIMEOUT_MS;
+    var pauseMs = Number(o.pauseMs) >= 0 ? Number(o.pauseMs) : IA_PAUSE_REJEU_MS;
+    var pause = o.pause || function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+    var modeles = (o.modeles && o.modeles.length) ? o.modeles : IA_MODELES[prov];
+
+    if (!cle) return Promise.reject(new Error("aucune clé configurée"));
+    if (!prompt) return Promise.reject(new Error("message vide"));
+    if (!fetchImpl) return Promise.reject(new Error("réseau indisponible"));
+
+    function tenter(i, rejoue) {
+      if (i >= modeles.length) return Promise.reject(new Error("aucun modèle disponible"));
+      var ep = iaEndpoint(prov, cle, modeles[i], prompt);
+      var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+      var options = ep.options;
+      if (ctrl) {
+        options = { method: ep.options.method, headers: ep.options.headers, body: ep.options.body, signal: ctrl.signal };
+      }
+      var minuteur, requete;
+      if (ctrl) {
+        minuteur = setTimeout(function () { ctrl.abort(); }, timeoutMs);
+        requete = fetchImpl(ep.url, options);
+      } else {
+        // Sans AbortController la requête ne peut pas être annulée, mais la promesse doit
+        // quand même se régler : sinon une requête qui pend fige le bouton IA pour toujours.
+        requete = Promise.race([
+          fetchImpl(ep.url, options),
+          new Promise(function (ignore, rejeter) {
+            minuteur = setTimeout(function () {
+              var e = new Error("délai dépassé"); e.name = "AbortError"; rejeter(e);
+            }, timeoutMs);
+          })
+        ]);
+      }
+      return requete.then(function (r) {
+        if (minuteur) clearTimeout(minuteur);
+        if (r.ok) {
+          return r.json().then(function (j) {
+            var t = iaExtraire(prov, j);
+            if (!t) throw new Error("réponse vide du fournisseur");
+            return t;
+          });
+        }
+        if (iaModeleInconnu(r.status) && i + 1 < modeles.length) return tenter(i + 1, false);
+        if (iaRejouable(r.status) && !rejoue) return pause(pauseMs).then(function () { return tenter(i, true); });
+        // Rejeu epuise sur une erreur transitoire (429 quota, 503 sature) : le modele suivant de la
+        // cascade est la derniere chance. Sans ce repli, un fournisseur gratuit sature rend le produit
+        // indisponible alors qu'un autre de ses modeles repond (constate en reel sur Gemini).
+        if (iaRejouable(r.status) && i + 1 < modeles.length) return tenter(i + 1, false);
+        var e = new Error(iaMessageErreur(r.status));
+        e.status = r.status;
+        throw e;
+      }, function (err) {
+        if (minuteur) clearTimeout(minuteur);
+        if (err && err.name === "AbortError") throw new Error("délai dépassé (" + Math.round(timeoutMs / 1000) + " s)");
+        if (!rejoue) return pause(pauseMs).then(function () { return tenter(i, true); });
+        throw new Error("réseau indisponible");
+      });
+    }
+    return tenter(0, false);
+  }
+
+  function construirePromptIA(base, o) {
+    o = o || {};
+    return "Tu es un assistant de recouvrement amiable pour une entreprise au Sénégal.\n" +
+      "Réécris le message de relance ci-dessous pour qu'il soit plus naturel et plus personnalisé.\n\n" +
+      "Règles absolues, vérifiées mécaniquement après ta réponse. Toute violation fait rejeter ta réécriture :\n" +
+      "1. N'introduis aucun nombre qui ne figure pas déjà dans le message.\n" +
+      "2. Conserve à l'identique le montant (" + (o.montantFmt || "") + "), la date d'échéance (" +
+        (o.dateFr || "") + ") et la mention FCFA.\n" +
+      "3. Conserve le nom du client (" + (o.nom || "") + ") et le moyen de paiement (" + (o.canal || "") + ").\n" +
+      "4. Termine par la signature, seule sur la dernière ligne : " + (o.expediteur || "") + "\n" +
+      "5. Aucune menace (police, huissier, tribunal, saisie, procès), aucune pénalité, aucun intérêt, " +
+        "aucune promesse, aucun lien, aucune adresse électronique.\n" +
+      "6. Garde le même niveau de fermeté, les accents du français et, si le message en contient, la partie en wolof.\n" +
+      "7. N'utilise jamais de tiret cadratin.\n" +
+      "8. Réponds uniquement par le message réécrit, sans commentaire ni guillemets.\n\n" +
+      "Message :\n" + String(base || "");
+  }
+
+  // --- Outils de comparaison deterministes ---
+  function sansAccents(s) {
+    return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  }
+  function compterDiacritiques(s) {
+    var m = String(s).normalize("NFD").match(/[\u0300-\u036f]/g);
+    return m ? m.length : 0;
+  }
+  function normEspaces(s) { return String(s).replace(/[\s\u202f\u00a0\u2009]+/g, " ").trim(); }
+
+  // « 150 000 » (fine, insecable ou espace ordinaire) devient « 150000 » : la comparaison des
+  // nombres est alors insensible au separateur de milliers choisi par le modele.
+  function normaliserGroupesChiffres(s) {
+    var t = String(s);
+    for (var k = 0; k < 4; k++) t = t.replace(/(\d)[\s\u202f\u00a0\u2009](?=\d{3}(?!\d))/g, "$1");
+    return t;
+  }
+  function jetonsNombres(s) {
+    var m = normaliserGroupesChiffres(s).match(/\d+/g);
+    return m || [];
+  }
+
+  // Lexique interdit. Un terme n'est une violation que s'il est ABSENT du message d'origine :
+  // le modele ne peut donc rien ajouter, mais il peut conserver ce que le moteur a legitimement ecrit.
+  // mode « mot » = frontieres des deux cotes ; « prefixe » = frontiere a gauche ; « brut » = sous-chaine.
+  var IA_LEXIQUE = [
+    { t: "police", mode: "mot" }, { t: "gendarmerie", mode: "mot" }, { t: "prison", mode: "mot" },
+    { t: "emprisonn", mode: "prefixe" }, { t: "arrestation", mode: "mot" }, { t: "plainte", mode: "mot" },
+    { t: "penal", mode: "prefixe" }, { t: "escroquerie", mode: "mot" }, { t: "voleur", mode: "mot" },
+    { t: "menteur", mode: "mot" }, { t: "honte", mode: "mot" },
+    { t: "huissier", mode: "mot" }, { t: "saisie", mode: "mot" }, { t: "saisir", mode: "prefixe" },
+    { t: "expulsion", mode: "mot" }, { t: "tribunal", mode: "mot" }, { t: "justice", mode: "mot" },
+    { t: "avocat", mode: "mot" }, { t: "proces", mode: "mot" }, { t: "poursuit", mode: "prefixe" },
+    { t: "poursuiv", mode: "prefixe" }, { t: "mandat", mode: "mot" },
+    { t: "garanti", mode: "prefixe" }, { t: "assurement", mode: "prefixe" },
+    { t: "interet", mode: "prefixe" }, { t: "majoration", mode: "mot" }, { t: "amende", mode: "mot" },
+    { t: "iban", mode: "mot" }, { t: "rib", mode: "mot" }, { t: "cheque", mode: "mot" },
+    { t: "virement", mode: "mot" }, { t: "especes", mode: "mot" }, { t: "wari", mode: "mot" },
+    { t: "compte bancaire", mode: "brut" }, { t: "western union", mode: "brut" }, { t: "free money", mode: "brut" },
+    { t: "paypal", mode: "mot" }, { t: "moneygram", mode: "mot" }
+  ];
+  var IA_CONTACTS = [
+    { t: "http", mode: "brut" }, { t: "www.", mode: "brut" }, { t: "bit.ly", mode: "brut" }, { t: "@", mode: "brut" }
+  ];
+
+  function contient(texteReplie, e) {
+    if (e.mode === "mot") return new RegExp("\\b" + e.t + "\\b").test(texteReplie);
+    if (e.mode === "prefixe") return new RegExp("\\b" + e.t).test(texteReplie);
+    return texteReplie.indexOf(e.t) !== -1;
+  }
+
+  var IA_MIN_RATIO = 0.5, IA_MAX_RATIO = 2.2, IA_RATIO_ACCENTS = 0.6;
+
+  var IA_LIBELLES = {
+    IA_VIDE: "réponse vide",
+    IA_LONGUEUR: "longueur anormale",
+    IA_NOMBRE_INVENTE: "un nombre absent du message d'origine a été introduit",
+    IA_MONTANT_ABSENT: "le montant dû n'est plus intact",
+    IA_DATE_ALTEREE: "la date d'échéance a été altérée",
+    IA_NOM_ABSENT: "le nom du client a disparu",
+    IA_CANAL_ALTERE: "le moyen de paiement a été modifié",
+    IA_SIGNATURE_ALTEREE: "la signature a été modifiée",
+    IA_LEXIQUE_INTERDIT: "un terme interdit a été ajouté (menace, promesse ou pénalité)",
+    IA_LIEN_OU_CONTACT: "un lien ou une adresse a été inséré",
+    IA_TYPOGRAPHIE: "typographie inattendue",
+    IA_CARACTERE_INTERDIT: "caractère interdit",
+    IA_ACCENTS_PERDUS: "les accents ont été perdus",
+    IA_WOLOF_PERDU: "la partie en wolof a disparu"
+  };
+
+  /**
+   * Garde-fou de sortie. Compare la reecriture du modele au message deterministe d'origine.
+   * @param {string} base    message genere par le moteur (verite)
+   * @param {string} propose reecriture renvoyee par le fournisseur
+   * @param {{nom:string,montant:number,dateFr:string,canal:string,expediteur:string}} o
+   * @returns {{ok:boolean, violations:{code:string,detail:string}[]}}
+   */
+  function verifierSortieIA(base, propose, o) {
+    o = o || {};
+    var v = [];
+    function ko(code, detail) { v.push({ code: code, detail: detail || "" }); }
+    var b = String(base == null ? "" : base);
+    var p = String(propose == null ? "" : propose);
+    var pt = p.trim();
+
+    if (!pt) { ko("IA_VIDE", "aucun texte"); return { ok: false, violations: v }; }
+    if (pt.length < b.length * IA_MIN_RATIO || pt.length > b.length * IA_MAX_RATIO) {
+      ko("IA_LONGUEUR", pt.length + " caractères contre " + b.length + " attendus");
+    }
+    if (/[\u2014\u2013]/.test(p)) ko("IA_TYPOGRAPHIE", "tiret cadratin ou demi-cadratin");
+    if (/[<>]/.test(p)) ko("IA_CARACTERE_INTERDIT", "chevron");
+    if (/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(p)) ko("IA_CARACTERE_INTERDIT", "caractère de contrôle");
+
+    // 1. Aucun nombre inventé : les nombres de la réécriture sont inclus dans ceux de l'origine.
+    var autorises = Object.create(null);
+    jetonsNombres(b).forEach(function (n) { autorises[n] = true; });
+    var jp = jetonsNombres(p);
+    var inventes = [];
+    jp.forEach(function (n) { if (!autorises[n] && inventes.indexOf(n) === -1) inventes.push(n); });
+    if (inventes.length) ko("IA_NOMBRE_INVENTE", inventes.join(", "));
+
+    // 2. Montant dû intact (chiffres + devise).
+    var mt = String(Math.floor(Math.abs(Number(o.montant) || 0)));
+    if (jp.indexOf(mt) === -1) ko("IA_MONTANT_ABSENT", mt);
+    else if (p.indexOf("FCFA") === -1) ko("IA_MONTANT_ABSENT", "mention FCFA");
+
+    // 3. Date d'échéance intacte : jour, mois en toutes lettres, année.
+    var pRepli = sansAccents(p);
+    var dparts = normEspaces(o.dateFr || "").split(" ");
+    if (dparts.length === 3) {
+      var okDate = jp.indexOf(dparts[0]) !== -1 &&
+                   jp.indexOf(dparts[2]) !== -1 &&
+                   pRepli.indexOf(sansAccents(dparts[1])) !== -1;
+      if (!okDate) ko("IA_DATE_ALTEREE", normEspaces(o.dateFr));
+    }
+
+    // 4. Nom du client conservé.
+    var nom = normEspaces(o.nom || "");
+    if (nom && sansAccents(normEspaces(p)).indexOf(sansAccents(nom)) === -1) ko("IA_NOM_ABSENT", nom);
+
+    // 5. Moyen de paiement conservé (au moins une des variantes proposées).
+    var canal = normEspaces(o.canal || "");
+    if (canal) {
+      var variantes = canal.split(/\s+ou\s+|\s*\/\s*|\s*,\s*/i).map(normEspaces).filter(Boolean);
+      var pn = sansAccents(normEspaces(p));
+      var trouve = variantes.some(function (x) { return pn.indexOf(sansAccents(x)) !== -1; });
+      if (!trouve) ko("IA_CANAL_ALTERE", canal);
+    }
+
+    // 6. Signature seule sur la dernière ligne non vide. Si l'appelant n'a pas fourni
+    // d'expéditeur, la vérité devient la dernière ligne du message d'origine : sans ce repli,
+    // un appel direct au moteur (o.expediteur vide) laisserait le modèle usurper la signature.
+    var exp = normEspaces(o.expediteur || "");
+    if (!exp) {
+      var lignesBase = b.split("\n").map(normEspaces).filter(Boolean);
+      exp = lignesBase.length ? lignesBase[lignesBase.length - 1] : "";
+    }
+    if (exp) {
+      var lignes = pt.split("\n").map(normEspaces).filter(Boolean);
+      if (!lignes.length || lignes[lignes.length - 1] !== exp) ko("IA_SIGNATURE_ALTEREE", exp);
+    }
+
+    // 7. Lexique interdit, et liens ou adresses : uniquement si absents de l'origine.
+    var bRepli = sansAccents(b);
+    IA_LEXIQUE.forEach(function (e) {
+      if (contient(pRepli, e) && !contient(bRepli, e)) ko("IA_LEXIQUE_INTERDIT", e.t);
+    });
+    IA_CONTACTS.forEach(function (e) {
+      if (contient(pRepli, e) && !contient(bRepli, e)) ko("IA_LIEN_OU_CONTACT", e.t);
+    });
+
+    // 8. Accents et diacritiques préservés (les modèles légers les suppriment souvent).
+    var ab = compterDiacritiques(b), ap = compterDiacritiques(p);
+    if (ab >= 5 && ap < ab * IA_RATIO_ACCENTS) ko("IA_ACCENTS_PERDUS", ap + " pour " + ab + " attendus");
+
+    // 9. Partie wolof préservée quand elle existe.
+    if (b.indexOf("Salaam") !== -1 && p.indexOf("Salaam") === -1) ko("IA_WOLOF_PERDU", "Salaam");
+
+    return { ok: v.length === 0, violations: v };
+  }
+
+  function resumeViolations(vs) {
+    var vus = [], out = [];
+    (vs || []).forEach(function (x) {
+      if (vus.indexOf(x.code) !== -1) return;
+      vus.push(x.code);
+      out.push(IA_LIBELLES[x.code] || x.code);
+    });
+    return out.join(" ; ");
+  }
+
+  /**
+   * Termes sensibles introduits par un CHAMP LIBRE (nom du client, expediteur, canal), et non par
+   * le gabarit du message. Methode : on regenere le meme message avec des valeurs NEUTRES ; tout
+   * terme du lexique present avec les vraies valeurs et absent avec les neutres ne peut venir que
+   * d'un champ libre. Le resultat porte sur le message DEJA assaini, celui que l'utilisateur enverra.
+   *
+   * On SIGNALE, on ne bloque jamais : « Étude d'Huissier Ndiaye » et « Cabinet d'Avocats Diop » sont
+   * des raisons sociales legitimes a Dakar. C'est a l'humain de trancher, il voit le message avant
+   * de l'envoyer. Le garde-fou de sortie IA, lui, est structurellement aveugle a ce cas : il
+   * n'interdit au modele que d'AJOUTER un terme absent de l'origine, or celui-ci y est deja.
+   */
+  function champsSuspects(d) {
+    d = d || {};
+    function texte(nom, exp, canal) {
+      var g = genererMessage({
+        nom: nom, expediteur: exp, canalPaiement: canal,
+        montant: d.montant, echeance: d.echeance, relation: d.relation, aujourdhui: d.aujourdhui
+      });
+      return sansAccents(g.fr + "\n" + g.wo);
+    }
+    var reel = texte(d.nom, d.expediteur, d.canalPaiement);
+    var neutre = texte("Client", "Expediteur", "Wave");
+    var out = [];
+    IA_LEXIQUE.concat(IA_CONTACTS).forEach(function (e) {
+      if (contient(reel, e) && !contient(neutre, e) && out.indexOf(e.t) === -1) out.push(e.t);
+    });
+    return out;
+  }
+
+  /* --- Export CSV -------------------------------------------------------------------------
+     Ajoute au moteur le 2026-08-15 apres une revue QA adverse. Ce code vivait dans le
+     gestionnaire de clic, apres la borne DEMO_END, donc dans la seule zone du fichier que Node
+     n'execute jamais. Demonstration faite par le relecteur : en remplacant la boucle sur les
+     dossiers par une boucle vide, l'export ne sortait plus que les entetes, pour tous les
+     visiteurs, et les 374 assertions restaient vertes. Un controle qui verifie le LIBELLE d'une
+     colonne ne verifie pas qu'elle est remplie. Le calcul est donc remonte ici, ou il s'execute
+     et se prouve ; il ne reste dans le clic que la fabrication du fichier. */
+  var CSV_COLONNES = ["nom", "whatsapp", "montant_fcfa", "echeance", "jours_retard", "niveau", "paye", "nb_relances", "derniere_relance"];
+
+  function lignesCSV(dossiers, aujourdhui) {
+    var lignes = [CSV_COLONNES.slice()];
+    (Array.isArray(dossiers) ? dossiers : []).forEach(function (d) {
+      var jr = joursRetard(d.echeance, aujourdhui);
+      var rz = resumeRelances(d.relances);
+      lignes.push([
+        d.nom, d.tel || "", d.montant, d.echeance, jr,
+        NIVEAUX[niveau(jr)].labelFr, d.paye ? "oui" : "non", rz.nombre, rz.derniereDate || ""
+      ]);
+    });
+    return lignes;
+  }
+
+  /** Serialisation RFC 4180 : separateur point-virgule (Excel FR), guillemets doubles echappes. */
+  function serialiserCSV(lignes) {
+    return lignes.map(function (r) {
+      return r.map(function (c) {
+        var s = String(c);
+        return /[",;\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      }).join(";");
+    }).join("\r\n");
+  }
+
+  return {
+    CSV_COLONNES: CSV_COLONNES, lignesCSV: lignesCSV, serialiserCSV: serialiserCSV,
+    fmtMontant: fmtMontant, fmtDateFr: fmtDateFr, joursRetard: joursRetard,
+    niveau: niveau, NIVEAUX: NIVEAUX, prioriteScore: prioriteScore,
+    normTel: normTel, lienWhatsapp: lienWhatsapp, genererMessage: genererMessage,
+    nombreEnLettres: nombreEnLettres, montantEnLettresFCFA: montantEnLettresFCFA,
+    genererMiseEnDemeure: genererMiseEnDemeure, resumeRelances: resumeRelances,
+    addDaysISO: addDaysISO, addMonthsISO: addMonthsISO, genererEcheancier: genererEcheancier,
+    genererMessageEcheancier: genererMessageEcheancier, prochaineRelanceConseillee: prochaineRelanceConseillee,
+    IA_MODELES: IA_MODELES, IA_LIBELLES: IA_LIBELLES, appelerIA: appelerIA,
+    iaEndpoint: iaEndpoint, iaExtraire: iaExtraire, iaRejouable: iaRejouable,
+    construirePromptIA: construirePromptIA, verifierSortieIA: verifierSortieIA,
+    resumeViolations: resumeViolations, jetonsNombres: jetonsNombres, sansAccents: sansAccents,
+    nettoyerChampLibre: nettoyerChampLibre, champsSuspects: champsSuspects, CHAMP_MAX: CHAMP_MAX
+  };
+})();
+/*ENGINE_END*/
+
+/*DEMO_START*/
+/**
+ * Couche DEMO PUBLIQUE, isolee du moteur et sans aucune dependance au DOM.
+ * Elle est bornee comme le moteur (DEMO_START / DEMO_END) pour la meme raison : ce qui n'est
+ * pas extractible n'est pas testable en Node, et ce qui n'est pas teste finit par mentir.
+ * Le 2026-08-15, c'est exactement ce qui etait arrive : la demo publiee promettait un echeancier
+ * et un export CSV qu'elle n'avait pas.
+ */
+var FAYNA_DEMO = (function () {
+  "use strict";
+
+  // Plafond de la demo publique. Il SIGNALE la frontiere du produit, il ne la protege pas :
+  // le fichier est un HTML autoportant sous licence MIT, n'importe qui peut lire la source et
+  // retirer cette limite. C'est assume, et ecrit tel quel dans DECISIONS.md (B3).
+  var PLAFOND = 5;
+
+  function peutAjouter(nb) { return Number(nb) < PLAFOND; }
+  function placesLibres(nb) { return Math.max(0, PLAFOND - Number(nb)); }
+
+  /**
+   * Amorcage au premier chargement. Deux effets distincts, volontairement separes :
+   *  - poserMarqueur : on note qu'on est deja passe, meme si on ne seme rien ;
+   *  - semer         : on ne pre-remplit QUE si l'utilisateur n'a rien a lui.
+   * Sans le marqueur, « Tout effacer » serait annule au rechargement suivant : on effacerait
+   * sans jamais rien effacer. C'est le bug que ce decoupage rend impossible.
+   */
+  function decisionAmorcage(dejaAmorce, nbDossiers) {
+    return { poserMarqueur: !dejaAmorce, semer: !dejaAmorce && Number(nbDossiers) === 0 };
+  }
+
+  /**
+   * Dossiers FICTIFS. Trois debiteurs, choisis pour qu'un visiteur voie d'emblee trois niveaux
+   * d'escalade differents sans rien saisir. Numeros fictifs, personne n'est joignable.
+   * Dates relatives au jour de la visite, sinon la demo vieillit toute seule.
+   */
+  function dossiersFictifs(aujourdhui) {
+    function minus(days) {
+      var d = new Date(aujourdhui + "T00:00:00Z");
+      d.setUTCDate(d.getUTCDate() - days);
+      return d.toISOString().slice(0, 10);
+    }
+    return [
+      { nom: "Boutique Ndiaye", tel: "771234567", montant: 150000, echeance: minus(22), langue: "bi", relation: "habituel", paye: false, relances: [] },
+      { nom: "Ets Fall & Frères", tel: "770001122", montant: 640000, echeance: minus(47), langue: "fr", relation: "nouveau", paye: false, relances: [{ date: minus(20), niveau: 2, langue: "fr" }, { date: minus(6), niveau: 3, langue: "fr" }] },
+      { nom: "Restaurant Teranga", tel: "776543210", montant: 85000, echeance: minus(4), langue: "bi", relation: "sensible", paye: false, relances: [] }
+    ];
+  }
+
+  return {
+    PLAFOND: PLAFOND, peutAjouter: peutAjouter, placesLibres: placesLibres,
+    decisionAmorcage: decisionAmorcage, dossiersFictifs: dossiersFictifs
+  };
+})();
+/*DEMO_END*/
+
+(function () {
+  "use strict";
+  if (typeof document === "undefined") return;
+  var E = FAYNA_ENGINE;
+  var D = FAYNA_DEMO;
+  var LS = "fayna_v1", LS_SET = "fayna_set_v1", LS_AI = "fayna_ai_v1";
+  var LS_SEED = "fayna_demo_seed_v1";
+  var $ = function (id) { return document.getElementById(id); };
+
+  function todayISO() {
+    var d = new Date();
+    var mm = String(d.getMonth() + 1).padStart(2, "0");
+    var dd = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + mm + "-" + dd;
+  }
+
+  function load(key, def) {
+    try { var v = JSON.parse(localStorage.getItem(key)); return v == null ? def : v; }
+    catch (e) { return def; }
+  }
+  function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} }
+
+  var state = load(LS, []);
+  var settings = load(LS_SET, { expediteur: "", canal: "Wave ou Orange Money", lieu: "Dakar" });
+  var editingRef = null;
+
+  // Cle IA : NON persistee par defaut (secret du client). L'utilisateur doit cocher explicitement
+  // « se souvenir ». Retro-compatibilite : une cle deja enregistree par une version anterieure est
+  // conservee, la case est alors pre-cochee (aucune perte silencieuse).
+  var ai = (function () {
+    var brut = load(LS_AI, null);
+    var a = { prov: "groq", key: "", remember: false };
+    if (brut && typeof brut === "object") {
+      a.prov = brut.prov === "gemini" ? "gemini" : "groq";
+      a.remember = brut.remember === true || (brut.remember === undefined && !!brut.key);
+      a.key = a.remember ? String(brut.key || "") : "";
+    }
+    return a;
+  })();
+
+  function saveAi() {
+    // Quand « se souvenir » est decoche, on ECRASE la cle stockee au lieu de la laisser trainer.
+    save(LS_AI, { prov: ai.prov, key: ai.remember ? ai.key : "", remember: ai.remember });
+  }
+
+  var toastT;
+  function toast(msg) {
+    var el = $("toast"); el.textContent = msg; el.classList.add("show");
+    clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove("show"); }, 2200);
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function ctx(d) {
+    return {
+      nom: d.nom, montant: d.montant, echeance: d.echeance,
+      relation: d.relation, langue: d.langue,
+      expediteur: settings.expediteur, canalPaiement: settings.canal,
+      aujourdhui: todayISO()
+    };
+  }
+
+  function msgFor(d, langue) {
+    var g = E.genererMessage(ctx(d));
+    if (langue === "fr") return g.fr;
+    if (langue === "wo") return g.wo;
+    return g.fr + "\n\n" + g.wo;
+  }
+
+  function render() {
+    $("s-exp").value = settings.expediteur;
+    $("s-canal").value = settings.canal;
+    $("s-lieu").value = settings.lieu || "Dakar";
+    $("ai-prov").value = ai.prov;
+    // ne pas reecrire la valeur du champ focalise : le curseur sauterait en fin de saisie
+    if ($("ai-key").value !== ai.key) $("ai-key").value = ai.key;
+    $("ai-remember").checked = ai.remember;
+
+    var today = todayISO();
+    var enriched = state.map(function (d, i) {
+      var jr = E.joursRetard(d.echeance, today);
+      return { d: d, i: i, jr: jr, niv: E.niveau(jr), prio: E.prioriteScore(d.montant, jr), paye: !!d.paye };
+    });
+    var actifs = enriched.filter(function (x) { return !x.paye; });
+    var totalDu = actifs.reduce(function (s, x) { return s + (Number(x.d.montant) || 0); }, 0);
+    var aRelancer = actifs.filter(function (x) { return x.jr >= -2; }).length;
+    var oldest = actifs.reduce(function (m, x) { return Math.max(m, x.jr); }, -9999);
+
+    $("kpi-total").textContent = E.fmtMontant(totalDu);
+    $("kpi-nb").textContent = String(aRelancer);
+    $("kpi-old").textContent = oldest > -9999 ? (Math.max(0, oldest) + (Math.abs(oldest) > 1 ? " jours" : " jour")) : "0";
+
+    enriched.sort(function (a, b) {
+      if (a.paye !== b.paye) return a.paye ? 1 : -1;
+      return b.prio - a.prio;
+    });
+
+    var list = $("list");
+    if (!enriched.length) {
+      list.innerHTML = '<p class="empty">Aucun impayé enregistré. Ajoutez un client ci-dessous, ou chargez un exemple.</p>';
+      return;
+    }
+    list.innerHTML = "";
+    enriched.forEach(function (x) {
+      var d = x.d, lvl = E.NIVEAUX[x.niv];
+      var wrap = document.createElement("article");
+      wrap.className = "debtor" + (x.paye ? " paye" : "");
+      var retardTxt = x.jr < 0 ? ("échéance dans " + Math.abs(x.jr) + (Math.abs(x.jr) > 1 ? " jours" : " jour"))
+        : (x.jr === 0 ? "échéance aujourd'hui" : (x.jr + (x.jr > 1 ? " jours de retard" : " jour de retard")));
+      var lang = d.langue || "bi";
+      wrap.innerHTML =
+        '<div class="dh"><span class="name">' + esc(d.nom) + '</span>' +
+        '<span class="amt">' + E.fmtMontant(d.montant) + '</span></div>' +
+        '<div class="meta">Échéance ' + E.fmtDateFr(d.echeance) + ' &#183; ' + esc(retardTxt) +
+        (x.paye ? ' &#183; <strong>paye</strong>' : '') + '</div>' +
+        '<span class="lvl lvl' + x.niv + '">' + esc(lvl.labelFr) + '</span>' +
+        '<div class="tabs" role="tablist" aria-label="Langue du message"></div>' +
+        '<div class="msg" id="msg-' + x.i + '"></div>' +
+        '<div class="acts"></div>';
+      list.appendChild(wrap);
+
+      var tabsEl = wrap.querySelector(".tabs");
+      var langs = [["bi", "FR + Wolof"], ["fr", "Français"], ["wo", "Wolof"]];
+      var cur = { l: lang };
+      var msgEl = wrap.querySelector("#msg-" + x.i);
+      msgEl.setAttribute("role", "tabpanel");
+      msgEl.setAttribute("tabindex", "0");
+      var tabBtns = [];
+      var revertBtn = null;
+      var waBtn = null;
+
+      // Badge « personnalise par l'IA » et zone de refus du garde-fou.
+      var chipEl = document.createElement("span");
+      chipEl.className = "ia-chip";
+      chipEl.textContent = "Personnalisé par l'IA, vérifié";
+      chipEl.hidden = true;
+      wrap.insertBefore(chipEl, msgEl);
+
+      var refusEl = document.createElement("div");
+      refusEl.className = "callout ia-refus";
+      refusEl.setAttribute("role", "alert");
+      refusEl.hidden = true;
+
+      // Avertissement de champ contamine. Un nom de client venu d'un import peut glisser un terme
+      // sensible dans le message. On ne bloque pas (une raison sociale peut contenir « Huissier »),
+      // on montre. `role="status"` et non `alert` : c'est une information, pas une erreur.
+      var suspects = E.champsSuspects(ctx(d));
+      if (suspects.length) {
+        var alerteEl = document.createElement("div");
+        alerteEl.className = "callout champ-suspect";
+        alerteEl.setAttribute("role", "status");
+        alerteEl.textContent = "Vérifiez le message : la fiche du client introduit " +
+          (suspects.length > 1 ? "les termes sensibles " : "le terme sensible ") +
+          suspects.map(function (t) { return "« " + t + " »"; }).join(", ") +
+          ". S'il ne s'agit pas de la raison sociale, corrigez la fiche avant d'envoyer.";
+        wrap.insertBefore(alerteEl, msgEl);
+      }
+
+      // La reecriture IA n'est retenue que si elle correspond EXACTEMENT au message
+      // deterministe dont elle est issue (meme langue, meme base). Si l'impaye est
+      // modifie ou la langue changee, elle est ignoree : jamais de texte perime envoye.
+      function iaTexte() {
+        var det = msgFor(d, cur.l);
+        return (d.ia && d.ia.langue === cur.l && d.ia.base === det) ? d.ia.texte : null;
+      }
+      function texteCourant() { return iaTexte() || msgFor(d, cur.l); }
+      function majIA() {
+        var actif = !!iaTexte();
+        chipEl.hidden = !actif;
+        if (revertBtn) revertBtn.hidden = !actif;
+      }
+      function paint() {
+        var t = texteCourant();
+        msgEl.textContent = t;
+        // le lien WhatsApp est tenu a jour ICI, pas seulement au clic : « copier l'adresse du lien »
+        // ou une ouverture dans un nouvel onglet portent donc toujours le texte reellement affiche
+        if (waBtn) waBtn.href = E.lienWhatsapp(d.tel, t);
+        majIA();
+        tabBtns.forEach(function (b) {
+          var sel = b.dataset.l === cur.l;
+          b.setAttribute("aria-selected", sel ? "true" : "false");
+          b.tabIndex = sel ? 0 : -1;
+          if (sel) msgEl.setAttribute("aria-labelledby", b.id);
+        });
+      }
+      function activer(idx, focus) {
+        cur.l = langs[idx][0]; d.langue = cur.l; save(LS, state); paint();
+        if (focus) tabBtns[idx].focus();
+      }
+      langs.forEach(function (L, idx) {
+        var b = document.createElement("button");
+        b.className = "tab"; b.type = "button"; b.dataset.l = L[0]; b.textContent = L[1];
+        b.id = "tab-" + x.i + "-" + L[0];
+        b.setAttribute("role", "tab");
+        b.setAttribute("aria-controls", "msg-" + x.i);
+        b.addEventListener("click", function () { activer(idx, false); });
+        b.addEventListener("keydown", function (e) {
+          var n = null;
+          if (e.key === "ArrowRight" || e.key === "ArrowDown") n = (idx + 1) % langs.length;
+          else if (e.key === "ArrowLeft" || e.key === "ArrowUp") n = (idx - 1 + langs.length) % langs.length;
+          else if (e.key === "Home") n = 0;
+          else if (e.key === "End") n = langs.length - 1;
+          if (n === null) return;
+          e.preventDefault(); activer(n, true);
+        });
+        tabBtns.push(b);
+        tabsEl.appendChild(b);
+      });
+      paint();
+
+      var acts = wrap.querySelector(".acts");
+      var waText = texteCourant;   // WhatsApp et Copier envoient EXACTEMENT le texte affiche
+
+      waBtn = document.createElement("a");
+      waBtn.className = "btn-wa btn-sm"; waBtn.textContent = "Envoyer WhatsApp";
+      waBtn.href = E.lienWhatsapp(d.tel, waText());
+      waBtn.target = "_blank"; waBtn.rel = "noopener noreferrer";
+      acts.appendChild(waBtn);
+
+      var copyBtn = mkBtn("Copier", "btn-ghost btn-sm", function () {
+        var t = waText();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(t).then(function () { toast("Message copié"); }, function () { toast("Copie impossible"); });
+        } else { toast("Copie non supportée"); }
+      });
+      acts.appendChild(copyBtn);
+
+      var sentBtn = mkBtn("Relance envoyée", "btn-ghost btn-sm", function () {
+        if (!Array.isArray(d.relances)) d.relances = [];
+        d.relances.push({ date: todayISO(), niveau: x.niv, langue: cur.l });
+        save(LS, state); render(); toast("Relance notée comme envoyée");
+      });
+      acts.appendChild(sentBtn);
+
+      if (x.niv >= 2) {
+        var mepBtn = mkBtn("Mise en demeure", "btn-ghost btn-sm", function () { ouvrirMiseEnDemeure(d); });
+        acts.appendChild(mepBtn);
+      }
+
+      if (ai.key) {
+        var aiBtn = mkBtn("Personnaliser (IA)", "btn-ghost btn-sm", function () {
+          var base = msgFor(d, cur.l);        // on repart TOUJOURS du message deterministe
+          var langue = cur.l;
+          var o = optionsIA(d);
+          aiBtn.disabled = true;
+          aiBtn.setAttribute("aria-busy", "true");
+          aiBtn.textContent = "Personnalisation...";
+          refusEl.hidden = true;
+          E.appelerIA({ prov: ai.prov, cle: ai.key, prompt: E.construirePromptIA(base, o) })
+            .then(function (txt) {
+              var v = E.verifierSortieIA(base, txt, o);
+              if (!v.ok) {
+                refusEl.textContent = "Réécriture refusée par le garde-fou : " +
+                  E.resumeViolations(v.violations) + ". Le message d'origine est conservé.";
+                refusEl.hidden = false;
+                toast("Réécriture refusée, message d'origine conservé");
+                return;
+              }
+              d.ia = { texte: txt, langue: langue, base: base };
+              save(LS, state);
+              paint();
+              toast("Message personnalisé et vérifié");
+            })
+            .catch(function (err) {
+              toast("IA indisponible : " + (err && err.message ? err.message : "erreur"));
+            })
+            .then(function () {
+              aiBtn.disabled = false;
+              aiBtn.removeAttribute("aria-busy");
+              aiBtn.textContent = "Personnaliser (IA)";
+            });
+        });
+        acts.appendChild(aiBtn);
+      }
+
+      // Cree meme sans cle : une reecriture deja acceptee doit toujours pouvoir etre annulee.
+      revertBtn = mkBtn("Revenir au message d'origine", "btn-ghost btn-sm", function () {
+        delete d.ia;
+        save(LS, state);
+        refusEl.hidden = true;
+        paint();
+        msgEl.focus();                        // le bouton vient d'etre masque : le focus ne se perd pas
+        toast("Message d'origine rétabli");
+      });
+      revertBtn.hidden = true;
+      acts.appendChild(revertBtn);
+
+      var sp = document.createElement("span"); sp.className = "spacer"; acts.appendChild(sp);
+
+      var editBtn = mkBtn("Modifier", "btn-ghost btn-sm", function () { enterEdit(d); });
+      acts.appendChild(editBtn);
+
+      var payBtn = mkBtn(x.paye ? "Rouvrir" : "Marquer paye", "btn-ghost btn-sm", function () {
+        d.paye = !d.paye; save(LS, state); render();
+      });
+      acts.appendChild(payBtn);
+
+      var delBtn = mkBtn("Supprimer", "btn-ghost btn-sm", function () {
+        if (editingRef === d) exitEdit();
+        state.splice(state.indexOf(d), 1); save(LS, state); render(); toast("Supprimé");
+      });
+      delBtn.style.color = "var(--danger)";
+      acts.appendChild(delBtn);
+
+      wrap.appendChild(refusEl);
+      paint();                                // lien WhatsApp et bouton de retour existent enfin : on synchronise
+
+      var rz = E.resumeRelances(d.relances);
+      if (rz.nombre > 0) {
+        var histEl = document.createElement("div");
+        histEl.className = "hist";
+        histEl.innerHTML = "Relances envoyées&#8239;: <strong>" + rz.nombre + "</strong>" +
+          (rz.derniereDate ? " &#183; dernière envoyée le <strong>" + esc(E.fmtDateFr(rz.derniereDate)) + "</strong>" : "");
+        wrap.appendChild(histEl);
+      }
+
+      if (!x.paye) {
+        // Cadence : prochaine relance conseillee (a partir de la derniere relance envoyee, sinon aujourd'hui)
+        var baseCad = rz.derniereDate || today;
+        var cad = E.prochaineRelanceConseillee(x.niv, baseCad);
+        var relanceMaintenant = !rz.derniereDate && x.jr >= 0;
+        var cadEl = document.createElement("p");
+        cadEl.className = "cadence";
+        cadEl.innerHTML = relanceMaintenant
+          ? "Cadence conseillée&#8239;: <strong>à relancer dès aujourd'hui</strong> (aucune relance encore notée)."
+          : "Prochaine relance conseillée&#8239;: <strong>" + esc(cad.dateFr) + "</strong>" +
+            (rz.derniereDate ? " (" + cad.delai + (cad.delai > 1 ? " jours" : " jour") + " après la dernière)" : "");
+        wrap.appendChild(cadEl);
+
+        // Echeancier de paiement negocie (des qu'il y a un retard, niveau >= 1)
+        if (x.niv >= 1) buildEcheancier(wrap, d, x);
+      }
+    });
+  }
+
+  // --- Panneau d'echeancier de paiement negocie (par carte impaye) ---
+  function buildEcheancier(wrap, d, x) {
+    var det = document.createElement("details");
+    det.className = "ech";
+    var sum = document.createElement("summary");
+    sum.textContent = "Proposer un échéancier de paiement";
+    det.appendChild(sum);
+
+    var ctrls = document.createElement("div");
+    ctrls.className = "ech-controls";
+    det.appendChild(ctrls);
+
+    // Champs construits en DOM (labels associes via htmlFor), pour une accessibilite reelle
+    function champSelect(idSuffixe, libelle, options) {
+      var fld = document.createElement("div"); fld.className = "fld";
+      var lab = document.createElement("label");
+      var id = "ech-" + idSuffixe + "-" + x.i;
+      lab.htmlFor = id; lab.textContent = libelle;
+      var sel = document.createElement("select"); sel.id = id;
+      options.forEach(function (o) {
+        var opt = document.createElement("option");
+        opt.value = o.v; opt.textContent = o.t; if (o.sel) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      fld.appendChild(lab); fld.appendChild(sel); ctrls.appendChild(fld);
+      return sel;
+    }
+    var selN = champSelect("n", "Nombre de versements", [
+      { v: "2", t: "2" }, { v: "3", t: "3", sel: true }, { v: "4", t: "4" }, { v: "6", t: "6" }, { v: "12", t: "12" }
+    ]);
+    var selF = champSelect("f", "Fréquence", [
+      { v: "mensuel", t: "Mensuelle", sel: true }, { v: "quinzaine", t: "Tous les 15 jours" }, { v: "hebdomadaire", t: "Hebdomadaire" }
+    ]);
+
+    var genBtn = mkBtn("Générer la proposition", "btn-primary btn-sm", function () { rebuild(); });
+    ctrls.appendChild(genBtn);
+
+    var out = document.createElement("div");
+    out.className = "ech-out";
+    det.appendChild(out);
+
+    function rebuild() {
+      var n = selN.value, freq = selF.value;
+      var res = E.genererMessageEcheancier({
+        nom: d.nom, montant: d.montant, nombre: n, frequence: freq, dateDebut: todayISO(),
+        expediteur: settings.expediteur, canalPaiement: settings.canal
+      });
+      var plan = res.plan;
+      var rows = plan.echeances.map(function (e) {
+        return '<tr><td>Versement ' + e.rang + '</td><td>' + esc(e.dateFr) + '</td><td class="num">' + esc(e.montantFmt) + '</td></tr>';
+      }).join("");
+      out.innerHTML =
+        '<div class="table-scroll" tabindex="0" role="group" aria-label="Tableau de l\'échéancier de paiement (défilement horizontal possible)">' +
+        '<table class="ech-table"><caption>Échéancier proposé (' + plan.nombre + ' versements, ' +
+          esc(E.fmtMontant(plan.total)) + ' au total)</caption>' +
+        '<thead><tr><th scope="col">Versement</th><th scope="col">Avant le</th><th class="num" scope="col">Montant</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+        '<tfoot><tr><td colspan="2">Total</td><td class="num">' + esc(E.fmtMontant(plan.somme)) + '</td></tr></tfoot></table>' +
+        '</div>' +
+        '<div class="msg"></div>' +
+        '<div class="acts"></div>';
+      var langCur = d.langue || "bi";
+      var texte = langCur === "fr" ? res.fr : (langCur === "wo" ? res.wo : res.fr + "\n\n" + res.wo);
+      out.querySelector(".msg").textContent = texte;
+      var acts = out.querySelector(".acts");
+      var waB = document.createElement("a");
+      waB.className = "btn-wa btn-sm"; waB.textContent = "Envoyer par WhatsApp";
+      waB.href = E.lienWhatsapp(d.tel, texte); waB.target = "_blank"; waB.rel = "noopener noreferrer";
+      acts.appendChild(waB);
+      acts.appendChild(mkBtn("Copier la proposition", "btn-ghost btn-sm", function () {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(texte).then(function () { toast("Proposition copiée"); }, function () { toast("Copie impossible"); });
+        } else { toast("Copie non supportée"); }
+      }));
+    }
+
+    selN.addEventListener("change", rebuild);
+    selF.addEventListener("change", rebuild);
+    det.addEventListener("toggle", function () { if (det.open && !out.innerHTML) rebuild(); });
+    wrap.appendChild(det);
+  }
+
+  function mkBtn(label, cls, fn) {
+    var b = document.createElement("button"); b.type = "button"; b.className = cls;
+    b.textContent = label; b.addEventListener("click", fn); return b;
+  }
+
+  function reduceMotion() {
+    return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+  function scrollToEl(el) {
+    if (el) el.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+  }
+
+  // --- Edition d'un impaye existant (le formulaire bascule en mode modification) ---
+  function enterEdit(d) {
+    editingRef = d;
+    $("f-nom").value = d.nom || "";
+    $("f-tel").value = d.tel || "";
+    $("f-montant").value = (d.montant != null ? d.montant : "");
+    $("f-echeance").value = d.echeance || "";
+    $("f-langue").value = d.langue || "bi";
+    $("f-relation").value = d.relation || "habituel";
+    $("btn-submit").textContent = "Enregistrer les modifications";
+    $("h-add").innerHTML = '<span class="num">2.</span> Modifier ce client';
+    $("btn-cancel-edit").hidden = false;
+    scrollToEl($("h-add"));
+    $("f-nom").focus();
+  }
+  function exitEdit() {
+    editingRef = null;
+    $("form").reset();
+    $("btn-submit").textContent = "Ajouter et générer la relance";
+    $("h-add").innerHTML = '<span class="num">2.</span> Ajouter un client qui doit';
+    $("btn-cancel-edit").hidden = true;
+  }
+
+  // --- Mise en demeure formelle imprimable ---
+  var mepLastFocus = null;
+  function mepKeydown(e) {
+    if (e.key === "Escape") { fermerMep(); return; }
+    if (e.key === "Tab") {                              // piege de focus dans la fenetre modale
+      var f = [$("mep-print"), $("mep-close")];
+      var i = f.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+    }
+  }
+  function ouvrirMiseEnDemeure(d) {
+    var m = E.genererMiseEnDemeure({
+      nom: d.nom, montant: d.montant, echeance: d.echeance,
+      expediteur: settings.expediteur, canalPaiement: settings.canal,
+      lieu: settings.lieu || "Dakar", aujourdhui: todayISO()
+    });
+    var FINE2 = " ";
+    var h = "";
+    h += '<div class="mep-head"><div><strong>' + esc(m.creancier) + '</strong></div>' +
+         '<div>' + esc(m.lieu) + ', le ' + esc(m.dateJour) + '</div></div>';
+    h += '<div class="mep-to">À l\'attention de<br><strong>' + esc(m.destinataire) + '</strong></div>';
+    h += '<div class="mep-mode">' + esc(m.modeRecommande) + '</div>';
+    h += '<h3>Mise en demeure de payer</h3>';
+    h += '<div class="mep-obj">Objet' + FINE2 + ': ' + esc(m.objet) + '</div>';
+    m.paragraphes.forEach(function (p) { h += '<p>' + esc(p) + '</p>'; });
+    h += '<div class="mep-sign">' + esc(m.creancier) + '<br><span style="color:#777777">(signature)</span></div>';
+    h += '<div class="mep-note">' + esc(m.note) + '</div>';
+    $("mep-doc").innerHTML = h;
+    $("mep-overlay").classList.add("open");
+    mepLastFocus = document.activeElement;
+    $("mep-close").focus();
+    document.addEventListener("keydown", mepKeydown);
+  }
+  function fermerMep() {
+    $("mep-overlay").classList.remove("open");
+    document.removeEventListener("keydown", mepKeydown);
+    if (mepLastFocus && mepLastFocus.focus) mepLastFocus.focus();
+  }
+
+  // Contexte de verification : EXACTEMENT les valeurs que le moteur a ecrites dans le message
+  // deterministe (memes valeurs par defaut), sinon le garde-fou compare a la mauvaise verite.
+  function optionsIA(d) {
+    var g = E.genererMessage(ctx(d));
+    return {
+      nom: (d.nom || "").trim() || "cher client",
+      montant: d.montant,
+      montantFmt: g.montant,
+      dateFr: g.dateFr,
+      canal: (settings.canal || "").trim() || "Wave ou Orange Money",
+      expediteur: (settings.expediteur || "").trim() || "[Votre entreprise]"
+    };
+  }
+
+  // events
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = e.target;
+    var nom = f.nom.value.trim();
+    var montant = String(f.montant.value).replace(/[^\d]/g, "");
+    var echeance = f.echeance.value;
+    if (!nom || !montant || !echeance) { toast("Nom, montant et date sont requis"); return; }
+    if (editingRef) {
+      editingRef.nom = nom; editingRef.tel = f.tel.value.trim(); editingRef.montant = Number(montant);
+      editingRef.echeance = echeance; editingRef.langue = f.langue.value; editingRef.relation = f.relation.value;
+      save(LS, state);
+      exitEdit();
+      render();
+      toast("Modifications enregistrées");
+      scrollToEl(document.getElementById("app"));
+      return;
+    }
+    if (!D.peutAjouter(state.length)) {
+      toast("Démo limitée à " + D.PLAFOND + " dossiers. Effacez-en un pour continuer.");
+      return;
+    }
+    state.push({
+      nom: nom, tel: f.tel.value.trim(), montant: Number(montant),
+      echeance: echeance, langue: f.langue.value, relation: f.relation.value, paye: false, relances: []
+    });
+    save(LS, state);
+    f.reset();
+    render();
+    toast("Client ajouté");
+    scrollToEl(document.getElementById("app"));
+  });
+
+  $("btn-cancel-edit").addEventListener("click", exitEdit);
+
+  $("btn-demo").addEventListener("click", function () {
+    var libres = D.placesLibres(state.length);
+    if (libres <= 0) { toast("Démo limitée à " + D.PLAFOND + " dossiers. Videz la liste d'abord."); return; }
+    D.dossiersFictifs(todayISO()).slice(0, libres).forEach(function (d) { state.push(d); });
+    save(LS, state); render(); toast("Exemple chargé");
+  });
+
+  $("s-exp").addEventListener("input", function (e) { settings.expediteur = e.target.value; save(LS_SET, settings); render(); });
+  $("s-canal").addEventListener("input", function (e) { settings.canal = e.target.value; save(LS_SET, settings); render(); });
+  $("s-lieu").addEventListener("input", function (e) { settings.lieu = e.target.value; save(LS_SET, settings); });
+  $("mep-close").addEventListener("click", fermerMep);
+  $("mep-print").addEventListener("click", function () { window.print(); });
+  $("mep-overlay").addEventListener("click", function (e) { if (e.target === this) fermerMep(); });
+  $("ai-prov").addEventListener("change", function (e) { ai.prov = e.target.value; saveAi(); });
+  $("ai-key").addEventListener("input", function (e) { ai.key = e.target.value.trim(); saveAi(); render(); });
+  $("ai-remember").addEventListener("change", function (e) {
+    ai.remember = !!e.target.checked;
+    saveAi();
+    toast(ai.remember ? "Clé enregistrée dans ce navigateur" : "Clé effacée de ce navigateur");
+  });
+
+  $("btn-clear").addEventListener("click", function () {
+    if (!state.length) { toast("Rien à effacer"); return; }
+    if (window.confirm("Effacer tous les impayés enregistrés ?")) { exitEdit(); state = []; save(LS, state); render(); toast("Effacé"); }
+  });
+
+  $("btn-export").addEventListener("click", function () {
+    // Le contenu est calcule par le moteur (E.lignesCSV / E.serialiserCSV), ou il est teste.
+    // Ce gestionnaire ne fait plus que fabriquer et declencher le telechargement.
+    var csv = E.serialiserCSV(E.lignesCSV(state, todayISO()));
+    var blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "fayna-impayes.csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    toast("CSV exporté");
+  });
+
+  // --- Amorcage de la DEMO publique ---------------------------------------------------------
+  // Exigence du rang 1 : « demo ouvrable en un clic, sans compte, avec des donnees fictives ».
+  // Un visiteur qui tombe sur une liste vide ne voit RIEN de ce que fait l'outil.
+  // La decision elle-meme vit dans FAYNA_DEMO, ou elle est testee en Node.
+  var amorcage = D.decisionAmorcage(load(LS_SEED, false), state.length);
+  if (amorcage.poserMarqueur) save(LS_SEED, true);
+  if (amorcage.semer) {
+    D.dossiersFictifs(todayISO()).forEach(function (d) { state.push(d); });
+    save(LS, state);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
