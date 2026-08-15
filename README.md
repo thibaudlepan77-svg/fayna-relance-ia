@@ -36,14 +36,14 @@ indépendamment.
 - `index.html` — la **page de vente** (prix, objections, CTA). Pas encore publiée, voir `DECISIONS.md` D1.
 - `docs/verifier-fayna.js` — oracle Node zéro-dépendance : structure, honnêteté, hors-ligne,
   et la **logique réelle du moteur** (formats FCFA/date, seuils d'escalade, téléphone, WhatsApp,
-  génération bilingue déterministe, garde-fou IA) plus la couche démo. **374 contrôles verts,
+  génération bilingue déterministe, garde-fou IA) plus la couche démo, la couche export CSV et un cliquet sur la zone DOM non testée. **393 contrôles verts,
   exit 0**. Cible surchargeable : `node docs/verifier-fayna.js <fichier>`.
-- `docs/rouge-moteur.js` — auto-test de l'oracle : 9 mutations injectées dans `demo.html`,
-  **9 attrapées**. Un oracle vert ne prouve rien tant qu'on ne l'a pas vu virer au rouge.
+- `docs/rouge-moteur.js` — auto-test de l'oracle : 13 mutations injectées dans `demo.html`,
+  **13 attrapées**. Un oracle vert ne prouve rien tant qu'on ne l'a pas vu virer au rouge.
 - `verifier.js` — harnais de cohérence commerciale (contacts canoniques, prix accordés entre la
   page et le parcours, objections, aucune allégation juridique invérifiable, et le fait que les
-  documents décrivent les **vraies** données fictives). **56 verts**, `--rouge` : **19/19 mutations
-  attrapées**, `--live` : vérifie l'URL publique en direct.
+  documents décrivent les **vraies** données fictives). **66 verts** hors ligne, **80 avec
+  `--live`**, `--rouge` : **24/24 mutations attrapées**.
 - `docs/ia-c65.js` — sonde de la couche IA (fetch simulé, hors-ligne) : garde-fou de sortie,
   appel robuste (délai, rejeu, cascade de modèles, promesse toujours réglée). **151 verts**.
 - `docs/ia-live-c65.mjs` — sonde IA **en réel** (clés gratuites du `.env` de l'axe) : vérificateur
@@ -55,11 +55,11 @@ indépendamment.
 
 ## Vérifier
 ```
-node docs/verifier-fayna.js     # oracle complet du produit  (374 verts)
-node docs/rouge-moteur.js       # l'oracle sait-il virer au rouge ?  (9/9)
-node verifier.js                # cohérence commerciale       (56 verts)
-node verifier.js --rouge        # mutations sur les documents (19/19)
-node verifier.js --live         # + l'URL publique en direct
+node docs/verifier-fayna.js     # oracle complet du produit  (393 verts)
+node docs/rouge-moteur.js       # l'oracle sait-il virer au rouge ?  (13/13)
+node verifier.js                # cohérence commerciale       (66 verts)
+node verifier.js --rouge        # mutations sur les documents (24/24)
+node verifier.js --live         # + l'URL publique en direct  (80 verts)
 node docs/ia-c65.js             # couche IA, fetch simulé (hors-ligne)
 node docs/ia-live-c65.mjs       # couche IA en réel (ignoré proprement sans clé)
 ```

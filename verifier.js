@@ -300,6 +300,19 @@ function verifierEnLigne() {
         ok(corps.length > 10000, "la page publique n'est pas vide (" + corps.length + " octets)");
         ok(corps.includes("FAYNA"), "la page publique porte la marque FAYNA");
         ok(corps.includes("localStorage"), "la demo publique embarque son moteur local");
+
+        // Ces controles-ci distinguent l'artefact NOUVEAU de l'ancien. Sans eux, le harnais
+        // aurait dit « en ligne, verifie » alors que GitHub Pages servait encore la version
+        // reduite de la veille : les controles generiques passaient sur les deux.
+        ok(corps.includes("/*DEMO_START*/"), "la page en ligne embarque la couche demo bornee");
+        ok(corps.includes("lignesCSV"), "la page en ligne porte l'export CSV du moteur");
+        ok(corps.includes("genererEcheancier"), "la page en ligne porte l'echeancier negocie");
+        ok(corps.includes("genererMiseEnDemeure"), "la page en ligne porte le modele de mise en demeure");
+        ok(corps.includes("5 dossiers au maximum"), "la page en ligne annonce son plafond de demo");
+        ok(corps.includes("2008-12"), "la page en ligne informe sur les donnees personnelles");
+        ok(corps.includes("contact@jaayleer.com"), "la page en ligne offre un chemin vers l'editeur");
+        // Taille : l'ancienne demo faisait 32 756 octets, le moteur complet en fait ~96 000.
+        ok(corps.length > 80000, "la page en ligne est bien le moteur complet (" + corps.length + " octets, l'artefact faible en faisait 32 756)");
         // Rien de commercial ne doit etre publie sur GitHub Pages (ToS : pas de site
         // « primarily directed at facilitating commercial transactions »).
         ok(!corps.includes("FCFA/mois"), "aucun tarif publie sur GitHub Pages (respect des ToS)");

@@ -78,6 +78,43 @@
 | `node verifier.js --rouge` | **19 mutations sur 19 attrapées** | Aucune des divergences déjà payées ne peut revenir en silence. |
 | `npm test` | **exit 0** | Les quatre ci-dessus enchaînés, rejouables par n'importe qui. |
 
+### Revue adverse, 3 relecteurs ciblés — ce qu'ils ont trouvé et ce qui a été corrigé
+
+Aucun des trois n'était là pour valider. Les trois ont trouvé quelque chose de réel.
+
+- **Juriste (droit des affaires sénégalais).** Aucun bloquant sur le courrier ni sur les
+  5 niveaux de relance : pas de menace illicite, pas d'usurpation de profession réglementée, et
+  le retrait du visa OHADA « n'affaiblit rien de réel — citer l'Acte uniforme sur les procédures
+  *simplifiées de recouvrement* dans une lettre privée était même trompeur ». **Un sérieux, corrigé :**
+  la loi 2008-12 sur les données personnelles était mentionnée sur la page de vente et **nulle part
+  dans l'outil**, alors que c'est l'outil qui fait saisir les données d'un tiers — le débiteur, qui
+  n'a rien demandé. Ajoutée à deux endroits, à l'activation de l'IA et dans les mentions, et
+  verrouillée par 2 assertions. Corrigé aussi : la réclamation d'« intérêts de retard et frais »
+  sans base contractuelle, désormais conditionnée aux conditions réellement convenues.
+- **Directeur commercial.** **Un « tue la vente », corrigé :** la seule page en ligne était un
+  cul-de-sac, aucun lien, aucun contact, « fuite de leads à 100 % ». La règle que j'avais posée le
+  matin même (« aucun contact dans la démo ») était **plus large que le ToS qu'elle prétendait
+  respecter** : GitHub interdit un site tourné vers la transaction, pas un outil libre qui nomme
+  son auteur. Recadrée sur la transaction (ni prix, ni panier, ni bouton d'abonnement) et durcie
+  là où ça compte (tout contact affiché doit être le canonique). Signalés et corrigés aussi :
+  « 30 % d'impayés en plus » et « gain de temps ×5 », deux chiffres sans source ni méthode.
+  **Non suivi :** il proposait d'abaisser le plafond à 3 dossiers. Refusé, parce que 3 est déjà le
+  nombre de dossiers fictifs pré-chargés : le visiteur ne pourrait pas saisir **son** client, et
+  c'est là que se joue la conviction. 5 laisse deux essais personnels, c'est le point d'équilibre.
+- **QA adverse.** **Un trou réel et structurel, corrigé :** tout ce qui suit `/*DEMO_END*/` est
+  gardé par `if (typeof document === "undefined") return;`, donc **jamais exécuté par Node**. Il l'a
+  prouvé en vidant la boucle de l'export CSV : le fichier sortait avec ses en-têtes et **zéro ligne
+  de données pour tous les visiteurs**, et l'oracle restait à 374/374 vert. Cause : les contrôles
+  vérifiaient le *libellé* des colonnes, jamais leur remplissage. Le calcul du CSV est remonté dans
+  le moteur (15 assertions sur le contenu réel), la mutation exacte du relecteur est entrée dans la
+  batterie et **vire au rouge**, et un **cliquet de 27 500 octets** a été posé sur la zone DOM
+  restante pour qu'aucune logique métier ne puisse plus y être enfouie.
+
+**Risque résiduel assumé, écrit ici plutôt que tu.** Le câblage DOM restant (rendu, écouteurs)
+n'est toujours **pas** exécuté par un harnais : il faudrait un navigateur sans tête, ce que le
+cycle n'a pas fait. Le cliquet empêche cette zone de grossir, il ne la teste pas. À traiter au
+prochain passage sur FAYNA.
+
 ### Garé en aValider — décisions qui ne m'appartiennent pas
 
 - **A3 bis (remplace A3, désormais tranché sur sa part technique).** La démo publiée est le produit complet. La part que je pouvais trancher l'a été (B1, B3). Reste la part qui appartient à Thibaud, **et elle est couplée à A1** : FAYNA étant un fichier client sous MIT, **aucune rareté du code n'est défendable**. Trois modèles possibles, un seul à choisir.
